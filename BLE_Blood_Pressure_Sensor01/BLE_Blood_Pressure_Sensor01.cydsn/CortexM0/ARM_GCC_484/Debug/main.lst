@@ -1,0 +1,2771 @@
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 6
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	mainTimer
+  18              		.bss
+  19              		.align	2
+  20              		.type	mainTimer, %object
+  21              		.size	mainTimer, 4
+  22              	mainTimer:
+  23 0000 00000000 		.space	4
+  24              		.comm	apiResult,2,2
+  25              		.section	.text.AppCallBack,"ax",%progbits
+  26              		.align	2
+  27              		.global	AppCallBack
+  28              		.code	16
+  29              		.thumb_func
+  30              		.type	AppCallBack, %function
+  31              	AppCallBack:
+  32              	.LFB35:
+  33              		.file 1 ".\\main.c"
+   1:.\main.c      **** /*******************************************************************************
+   2:.\main.c      **** * File Name: main.c
+   3:.\main.c      **** *
+   4:.\main.c      **** * Version 1.0
+   5:.\main.c      **** *
+   6:.\main.c      **** * Description:
+   7:.\main.c      **** *  Blood Pressure Sensor example project simulates blood pressure records
+   8:.\main.c      **** *  and sends them over the BLE Blood Pressure Service.
+   9:.\main.c      **** *
+  10:.\main.c      **** * Note:
+  11:.\main.c      **** *
+  12:.\main.c      **** * Hardware Dependency:
+  13:.\main.c      **** *  CY8CKIT-042 BLE
+  14:.\main.c      **** *
+  15:.\main.c      **** ********************************************************************************
+  16:.\main.c      **** * Copyright 2015, Cypress Semiconductor Corporation.  All rights reserved.
+  17:.\main.c      **** * You may use this file only in accordance with the license, terms, conditions,
+  18:.\main.c      **** * disclaimers, and limitations in the end user license agreement accompanying
+  19:.\main.c      **** * the software package with which this file was provided.
+  20:.\main.c      **** *******************************************************************************/
+  21:.\main.c      **** 
+  22:.\main.c      **** #include "blss.h"
+  23:.\main.c      **** #include "bas.h"
+  24:.\main.c      **** 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 2
+
+
+  25:.\main.c      **** volatile uint32 mainTimer = 0;
+  26:.\main.c      **** CYBLE_API_RESULT_T apiResult;
+  27:.\main.c      **** 
+  28:.\main.c      **** 
+  29:.\main.c      **** /*******************************************************************************
+  30:.\main.c      **** * Function Name: AppCallBack()
+  31:.\main.c      **** ********************************************************************************
+  32:.\main.c      **** *
+  33:.\main.c      **** * Summary:
+  34:.\main.c      **** *   This is an event callback function to receive events from the BLE Component.
+  35:.\main.c      **** *
+  36:.\main.c      **** * Parameters:
+  37:.\main.c      **** *  event - the event code
+  38:.\main.c      **** *  *eventParam - the event parameters
+  39:.\main.c      **** *
+  40:.\main.c      **** *******************************************************************************/
+  41:.\main.c      **** void AppCallBack(uint32 event, void* eventParam)
+  42:.\main.c      **** {
+  34              		.loc 1 42 0
+  35              		.cfi_startproc
+  36 0000 80B5     		push	{r7, lr}
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 7, -8
+  39              		.cfi_offset 14, -4
+  40 0002 82B0     		sub	sp, sp, #8
+  41              		.cfi_def_cfa_offset 16
+  42 0004 00AF     		add	r7, sp, #0
+  43              		.cfi_def_cfa_register 7
+  44 0006 7860     		str	r0, [r7, #4]
+  45 0008 3960     		str	r1, [r7]
+  43:.\main.c      **** #ifdef DEBUG_OUT    
+  44:.\main.c      ****     DebugOut(event, eventParam);
+  46              		.loc 1 44 0
+  47 000a 7A68     		ldr	r2, [r7, #4]
+  48 000c 3B68     		ldr	r3, [r7]
+  49 000e 101C     		mov	r0, r2
+  50 0010 191C     		mov	r1, r3
+  51 0012 FFF7FEFF 		bl	DebugOut
+  45:.\main.c      **** #endif
+  46:.\main.c      **** 
+  47:.\main.c      ****     switch(event)
+  52              		.loc 1 47 0
+  53 0016 7B68     		ldr	r3, [r7, #4]
+  54 0018 272B     		cmp	r3, #39
+  55 001a 0AD0     		beq	.L3
+  56 001c 282B     		cmp	r3, #40
+  57 001e 02D0     		beq	.L4
+  58 0020 012B     		cmp	r3, #1
+  59 0022 00D0     		beq	.L4
+  48:.\main.c      ****     {
+  49:.\main.c      ****         case CYBLE_EVT_STACK_ON:
+  50:.\main.c      ****         case CYBLE_EVT_GAP_DEVICE_DISCONNECTED:
+  51:.\main.c      ****             batteryMeasure = DISABLED;
+  52:.\main.c      ****             /* Put the device to discoverable mode so that remote can search it. */
+  53:.\main.c      ****             StartAdvertisement();
+  54:.\main.c      ****             break;
+  55:.\main.c      ****             
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 3
+
+
+  56:.\main.c      ****         case CYBLE_EVT_GAP_DEVICE_CONNECTED:
+  57:.\main.c      ****             Advertising_LED_Write(LED_OFF);
+  58:.\main.c      ****             break;
+  59:.\main.c      **** 
+  60:.\main.c      ****         default:
+  61:.\main.c      ****             break;
+  60              		.loc 1 61 0
+  61 0024 09E0     		b	.L1
+  62              	.L4:
+  51:.\main.c      ****             batteryMeasure = DISABLED;
+  63              		.loc 1 51 0
+  64 0026 064B     		ldr	r3, .L6
+  65 0028 0022     		mov	r2, #0
+  66 002a 1A80     		strh	r2, [r3]
+  53:.\main.c      ****             StartAdvertisement();
+  67              		.loc 1 53 0
+  68 002c FFF7FEFF 		bl	StartAdvertisement
+  54:.\main.c      ****             break;
+  69              		.loc 1 54 0
+  70 0030 03E0     		b	.L1
+  71              	.L3:
+  57:.\main.c      ****             Advertising_LED_Write(LED_OFF);
+  72              		.loc 1 57 0
+  73 0032 0120     		mov	r0, #1
+  74 0034 FFF7FEFF 		bl	Advertising_LED_Write
+  58:.\main.c      ****             break;
+  75              		.loc 1 58 0
+  76 0038 C046     		mov	r8, r8
+  77              	.L1:
+  62:.\main.c      ****     }
+  63:.\main.c      **** }
+  78              		.loc 1 63 0
+  79 003a BD46     		mov	sp, r7
+  80 003c 02B0     		add	sp, sp, #8
+  81              		@ sp needed
+  82 003e 80BD     		pop	{r7, pc}
+  83              	.L7:
+  84              		.align	2
+  85              	.L6:
+  86 0040 00000000 		.word	batteryMeasure
+  87              		.cfi_endproc
+  88              	.LFE35:
+  89              		.size	AppCallBack, .-AppCallBack
+  90              		.section	.text.Timer_Interrupt,"ax",%progbits
+  91              		.align	2
+  92              		.global	Timer_Interrupt
+  93              		.code	16
+  94              		.thumb_func
+  95              		.type	Timer_Interrupt, %function
+  96              	Timer_Interrupt:
+  97              	.LFB36:
+  64:.\main.c      **** 
+  65:.\main.c      **** 
+  66:.\main.c      **** /*******************************************************************************
+  67:.\main.c      **** * Function Name: Timer_Interrupt
+  68:.\main.c      **** ********************************************************************************
+  69:.\main.c      **** *
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 4
+
+
+  70:.\main.c      **** * Summary:
+  71:.\main.c      **** *  Handles the Interrupt Service Routine for the WDT timer.
+  72:.\main.c      **** *  It is called from common WDT ISR located in BLE component. 
+  73:.\main.c      **** *
+  74:.\main.c      **** *******************************************************************************/
+  75:.\main.c      **** void Timer_Interrupt(void)
+  76:.\main.c      **** {
+  98              		.loc 1 76 0
+  99              		.cfi_startproc
+ 100 0000 80B5     		push	{r7, lr}
+ 101              		.cfi_def_cfa_offset 8
+ 102              		.cfi_offset 7, -8
+ 103              		.cfi_offset 14, -4
+ 104 0002 00AF     		add	r7, sp, #0
+ 105              		.cfi_def_cfa_register 7
+  77:.\main.c      ****     if(CySysWdtGetInterruptSource() & WDT_INTERRUPT_SOURCE)
+ 106              		.loc 1 77 0
+ 107 0004 FFF7FEFF 		bl	CySysWdtGetInterruptSource
+ 108 0008 021C     		mov	r2, r0
+ 109 000a 8023     		mov	r3, #128
+ 110 000c DB00     		lsl	r3, r3, #3
+ 111 000e 1340     		and	r3, r2
+ 112 0010 19D0     		beq	.L8
+ 113              	.LBB2:
+  78:.\main.c      ****     {
+  79:.\main.c      ****         static uint8 led = LED_OFF;
+  80:.\main.c      ****         
+  81:.\main.c      ****         /* Blink LED to indicate that device advertises */
+  82:.\main.c      ****         if(CYBLE_STATE_ADVERTISING == CyBle_GetState())
+ 114              		.loc 1 82 0
+ 115 0012 0E4B     		ldr	r3, .L11
+ 116 0014 1B78     		ldrb	r3, [r3]
+ 117 0016 032B     		cmp	r3, #3
+ 118 0018 0BD1     		bne	.L10
+  83:.\main.c      ****         {
+  84:.\main.c      ****             led ^= LED_OFF;
+ 119              		.loc 1 84 0
+ 120 001a 0D4B     		ldr	r3, .L11+4
+ 121 001c 1B78     		ldrb	r3, [r3]
+ 122 001e 0122     		mov	r2, #1
+ 123 0020 5340     		eor	r3, r2
+ 124 0022 DAB2     		uxtb	r2, r3
+ 125 0024 0A4B     		ldr	r3, .L11+4
+ 126 0026 1A70     		strb	r2, [r3]
+  85:.\main.c      ****             Advertising_LED_Write(led);
+ 127              		.loc 1 85 0
+ 128 0028 094B     		ldr	r3, .L11+4
+ 129 002a 1B78     		ldrb	r3, [r3]
+ 130 002c 181C     		mov	r0, r3
+ 131 002e FFF7FEFF 		bl	Advertising_LED_Write
+ 132              	.L10:
+  86:.\main.c      ****         }
+  87:.\main.c      ****         
+  88:.\main.c      ****         /* Indicate that timer is raised to the main loop */
+  89:.\main.c      ****         mainTimer++;
+ 133              		.loc 1 89 0
+ 134 0032 084B     		ldr	r3, .L11+8
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 5
+
+
+ 135 0034 1B68     		ldr	r3, [r3]
+ 136 0036 5A1C     		add	r2, r3, #1
+ 137 0038 064B     		ldr	r3, .L11+8
+ 138 003a 1A60     		str	r2, [r3]
+  90:.\main.c      ****         
+  91:.\main.c      ****         /* Clears interrupt request  */
+  92:.\main.c      ****         CySysWdtClearInterrupt(WDT_INTERRUPT_SOURCE);
+ 139              		.loc 1 92 0
+ 140 003c 8023     		mov	r3, #128
+ 141 003e DB00     		lsl	r3, r3, #3
+ 142 0040 181C     		mov	r0, r3
+ 143 0042 FFF7FEFF 		bl	CySysWdtClearInterrupt
+ 144              	.L8:
+ 145              	.LBE2:
+  93:.\main.c      ****     }
+  94:.\main.c      **** }
+ 146              		.loc 1 94 0
+ 147 0046 BD46     		mov	sp, r7
+ 148              		@ sp needed
+ 149 0048 80BD     		pop	{r7, pc}
+ 150              	.L12:
+ 151 004a C046     		.align	2
+ 152              	.L11:
+ 153 004c 00000000 		.word	cyBle_state
+ 154 0050 00000000 		.word	led.7512
+ 155 0054 00000000 		.word	mainTimer
+ 156              		.cfi_endproc
+ 157              	.LFE36:
+ 158              		.size	Timer_Interrupt, .-Timer_Interrupt
+ 159              		.section	.text.WDT_Start,"ax",%progbits
+ 160              		.align	2
+ 161              		.global	WDT_Start
+ 162              		.code	16
+ 163              		.thumb_func
+ 164              		.type	WDT_Start, %function
+ 165              	WDT_Start:
+ 166              	.LFB37:
+  95:.\main.c      **** 
+  96:.\main.c      **** /*******************************************************************************
+  97:.\main.c      **** * Function Name: WDT_Start
+  98:.\main.c      **** ********************************************************************************
+  99:.\main.c      **** *
+ 100:.\main.c      **** * Summary:
+ 101:.\main.c      **** *  Configures WDT(counter 2) to trigger an interrupt every second.
+ 102:.\main.c      **** *
+ 103:.\main.c      **** *******************************************************************************/
+ 104:.\main.c      **** 
+ 105:.\main.c      **** void WDT_Start(void)
+ 106:.\main.c      **** {
+ 167              		.loc 1 106 0
+ 168              		.cfi_startproc
+ 169 0000 80B5     		push	{r7, lr}
+ 170              		.cfi_def_cfa_offset 8
+ 171              		.cfi_offset 7, -8
+ 172              		.cfi_offset 14, -4
+ 173 0002 00AF     		add	r7, sp, #0
+ 174              		.cfi_def_cfa_register 7
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 6
+
+
+ 107:.\main.c      ****    
+ 108:.\main.c      ****     /* Unlock the WDT registers for modification */
+ 109:.\main.c      ****     CySysWdtUnlock(); 
+ 175              		.loc 1 109 0
+ 176 0004 FFF7FEFF 		bl	CySysWdtUnlock
+ 110:.\main.c      ****     /* Setup ISR callback */
+ 111:.\main.c      ****     WdtIsr_StartEx(Timer_Interrupt);
+ 177              		.loc 1 111 0
+ 178 0008 0E4B     		ldr	r3, .L14
+ 179 000a 181C     		mov	r0, r3
+ 180 000c FFF7FEFF 		bl	WdtIsr_StartEx
+ 112:.\main.c      ****     /* Write the mode to generate interrupt on match */
+ 113:.\main.c      ****     CySysWdtWriteMode(WDT_COUNTER, CY_SYS_WDT_MODE_INT);
+ 181              		.loc 1 113 0
+ 182 0010 0120     		mov	r0, #1
+ 183 0012 0121     		mov	r1, #1
+ 184 0014 FFF7FEFF 		bl	CySysWdtWriteMode
+ 114:.\main.c      ****     /* Configure the WDT counter clear on a match setting */
+ 115:.\main.c      ****     CySysWdtWriteClearOnMatch(WDT_COUNTER, WDT_COUNTER_ENABLE);
+ 185              		.loc 1 115 0
+ 186 0018 0120     		mov	r0, #1
+ 187 001a 0121     		mov	r1, #1
+ 188 001c FFF7FEFF 		bl	CySysWdtWriteClearOnMatch
+ 116:.\main.c      ****     /* Configure the WDT counter match comparison value */
+ 117:.\main.c      ****     CySysWdtWriteMatch(WDT_COUNTER, WDT_1SEC);
+ 189              		.loc 1 117 0
+ 190 0020 094B     		ldr	r3, .L14+4
+ 191 0022 0120     		mov	r0, #1
+ 192 0024 191C     		mov	r1, r3
+ 193 0026 FFF7FEFF 		bl	CySysWdtWriteMatch
+ 118:.\main.c      ****     /* Reset WDT counter */
+ 119:.\main.c      ****     CySysWdtResetCounters(WDT_COUNTER);
+ 194              		.loc 1 119 0
+ 195 002a 0120     		mov	r0, #1
+ 196 002c FFF7FEFF 		bl	CySysWdtResetCounters
+ 120:.\main.c      ****     /* Enable the specified WDT counter */
+ 121:.\main.c      ****     CySysWdtEnable(WDT_COUNTER_MASK);
+ 197              		.loc 1 121 0
+ 198 0030 8023     		mov	r3, #128
+ 199 0032 5B00     		lsl	r3, r3, #1
+ 200 0034 181C     		mov	r0, r3
+ 201 0036 FFF7FEFF 		bl	CySysWdtEnable
+ 122:.\main.c      ****     /* Lock out configuration changes to the Watchdog timer registers */
+ 123:.\main.c      ****     CySysWdtLock();    
+ 202              		.loc 1 123 0
+ 203 003a FFF7FEFF 		bl	CySysWdtLock
+ 124:.\main.c      **** }
+ 204              		.loc 1 124 0
+ 205 003e BD46     		mov	sp, r7
+ 206              		@ sp needed
+ 207 0040 80BD     		pop	{r7, pc}
+ 208              	.L15:
+ 209 0042 C046     		.align	2
+ 210              	.L14:
+ 211 0044 00000000 		.word	Timer_Interrupt
+ 212 0048 FF7F0000 		.word	32767
+ 213              		.cfi_endproc
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 7
+
+
+ 214              	.LFE37:
+ 215              		.size	WDT_Start, .-WDT_Start
+ 216              		.section	.rodata
+ 217              		.align	2
+ 218              	.LC5:
+ 219 0000 424C4520 		.ascii	"BLE Blood Pressure Sensor Example Project \015\000"
+ 219      426C6F6F 
+ 219      64205072 
+ 219      65737375 
+ 219      72652053 
+ 220              		.align	2
+ 221              	.LC9:
+ 222 002c 4379426C 		.ascii	"CyBle_Start API Error: %x \015\012\000"
+ 222      655F5374 
+ 222      61727420 
+ 222      41504920 
+ 222      4572726F 
+ 223 0049 000000   		.align	2
+ 224              	.LC12:
+ 225 004c 4379426C 		.ascii	"CyBle_BlssSetCharacteristicValue API Error: %x \015"
+ 225      655F426C 
+ 225      73735365 
+ 225      74436861 
+ 225      72616374 
+ 226 007c 0A00     		.ascii	"\012\000"
+ 227 007e 0000     		.align	2
+ 228              	.LC19:
+ 229 0080 53746F72 		.ascii	"Store bonding data, status: %x \015\012\000"
+ 229      6520626F 
+ 229      6E64696E 
+ 229      67206461 
+ 229      74612C20 
+ 230 00a2 0000     		.section	.text.main,"ax",%progbits
+ 231              		.align	2
+ 232              		.global	main
+ 233              		.code	16
+ 234              		.thumb_func
+ 235              		.type	main, %function
+ 236              	main:
+ 237              	.LFB38:
+ 125:.\main.c      **** 
+ 126:.\main.c      **** 
+ 127:.\main.c      **** int main()
+ 128:.\main.c      **** {
+ 238              		.loc 1 128 0
+ 239              		.cfi_startproc
+ 240 0000 90B5     		push	{r4, r7, lr}
+ 241              		.cfi_def_cfa_offset 12
+ 242              		.cfi_offset 4, -12
+ 243              		.cfi_offset 7, -8
+ 244              		.cfi_offset 14, -4
+ 245 0002 83B0     		sub	sp, sp, #12
+ 246              		.cfi_def_cfa_offset 24
+ 247 0004 00AF     		add	r7, sp, #0
+ 248              		.cfi_def_cfa_register 7
+ 129:.\main.c      ****     CYBLE_LP_MODE_T lpMode;
+ 130:.\main.c      ****     CYBLE_BLESS_STATE_T blessState;
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 8
+
+
+ 131:.\main.c      **** 
+ 132:.\main.c      ****     CyGlobalIntEnable;
+ 249              		.loc 1 132 0
+ 250              	@ 132 ".\main.c" 1
+ 251 0006 62B6     		CPSIE   i
+ 252              	@ 0 "" 2
+ 133:.\main.c      ****     UART_DEB_Start();               /* Start communication component */
+ 253              		.loc 1 133 0
+ 254              		.code	16
+ 255 0008 FFF7FEFF 		bl	UART_DEB_Start
+ 134:.\main.c      ****     printf("BLE Blood Pressure Sensor Example Project \r\n");
+ 256              		.loc 1 134 0
+ 257 000c 594B     		ldr	r3, .L32
+ 258 000e 181C     		mov	r0, r3
+ 259 0010 FFF7FEFF 		bl	puts
+ 135:.\main.c      **** 
+ 136:.\main.c      ****     Disconnect_LED_Write(LED_OFF);
+ 260              		.loc 1 136 0
+ 261 0014 0120     		mov	r0, #1
+ 262 0016 FFF7FEFF 		bl	Disconnect_LED_Write
+ 137:.\main.c      ****     Advertising_LED_Write(LED_OFF);
+ 263              		.loc 1 137 0
+ 264 001a 0120     		mov	r0, #1
+ 265 001c FFF7FEFF 		bl	Advertising_LED_Write
+ 138:.\main.c      ****     LowPower_LED_Write(LED_OFF);
+ 266              		.loc 1 138 0
+ 267 0020 0120     		mov	r0, #1
+ 268 0022 FFF7FEFF 		bl	LowPower_LED_Write
+ 139:.\main.c      **** 
+ 140:.\main.c      ****     if(CYBLE_ERROR_OK != (apiResult = CyBle_Start(AppCallBack)))
+ 269              		.loc 1 140 0
+ 270 0026 544B     		ldr	r3, .L32+4
+ 271 0028 181C     		mov	r0, r3
+ 272 002a FFF7FEFF 		bl	CyBle_Start
+ 273 002e 031C     		mov	r3, r0
+ 274 0030 1A1C     		mov	r2, r3
+ 275 0032 524B     		ldr	r3, .L32+8
+ 276 0034 1A80     		strh	r2, [r3]
+ 277 0036 514B     		ldr	r3, .L32+8
+ 278 0038 1B88     		ldrh	r3, [r3]
+ 279 003a 002B     		cmp	r3, #0
+ 280 003c 06D0     		beq	.L17
+ 141:.\main.c      ****     {
+ 142:.\main.c      ****         printf("CyBle_Start API Error: %x \r\n", apiResult);
+ 281              		.loc 1 142 0
+ 282 003e 4F4B     		ldr	r3, .L32+8
+ 283 0040 1B88     		ldrh	r3, [r3]
+ 284 0042 4F4A     		ldr	r2, .L32+12
+ 285 0044 101C     		mov	r0, r2
+ 286 0046 191C     		mov	r1, r3
+ 287 0048 FFF7FEFF 		bl	printf
+ 288              	.L17:
+ 143:.\main.c      ****     }
+ 144:.\main.c      **** 
+ 145:.\main.c      ****     BasInit();
+ 289              		.loc 1 145 0
+ 290 004c FFF7FEFF 		bl	BasInit
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 9
+
+
+ 146:.\main.c      ****     BlsInit();
+ 291              		.loc 1 146 0
+ 292 0050 FFF7FEFF 		bl	BlsInit
+ 147:.\main.c      ****     
+ 148:.\main.c      ****     ADC_Start();
+ 293              		.loc 1 148 0
+ 294 0054 FFF7FEFF 		bl	ADC_Start
+ 149:.\main.c      ****     WDT_Start();
+ 295              		.loc 1 149 0
+ 296 0058 FFF7FEFF 		bl	WDT_Start
+ 150:.\main.c      ****     
+ 151:.\main.c      ****     /* Uncomment the line below to printf all events via UART for debug */
+ 152:.\main.c      ****     /*cyBle_eventHandlerFlag |= CYBLE_ENABLE_ALL_EVENTS;*/
+ 153:.\main.c      **** 
+ 154:.\main.c      ****     if(CYBLE_ERROR_OK != (apiResult = CyBle_BlssSetCharacteristicValue(CYBLE_BLS_BPF, sizeof(uint16
+ 297              		.loc 1 154 0
+ 298 005c 494B     		ldr	r3, .L32+16
+ 299 005e 0220     		mov	r0, #2
+ 300 0060 0221     		mov	r1, #2
+ 301 0062 1A1C     		mov	r2, r3
+ 302 0064 FFF7FEFF 		bl	CyBle_BlssSetCharacteristicValue
+ 303 0068 031C     		mov	r3, r0
+ 304 006a 1A1C     		mov	r2, r3
+ 305 006c 434B     		ldr	r3, .L32+8
+ 306 006e 1A80     		strh	r2, [r3]
+ 307 0070 424B     		ldr	r3, .L32+8
+ 308 0072 1B88     		ldrh	r3, [r3]
+ 309 0074 002B     		cmp	r3, #0
+ 310 0076 06D0     		beq	.L18
+ 155:.\main.c      ****     {
+ 156:.\main.c      ****         printf("CyBle_BlssSetCharacteristicValue API Error: %x \r\n", apiResult);
+ 311              		.loc 1 156 0
+ 312 0078 404B     		ldr	r3, .L32+8
+ 313 007a 1B88     		ldrh	r3, [r3]
+ 314 007c 424A     		ldr	r2, .L32+20
+ 315 007e 101C     		mov	r0, r2
+ 316 0080 191C     		mov	r1, r3
+ 317 0082 FFF7FEFF 		bl	printf
+ 318              	.L18:
+ 157:.\main.c      ****     }
+ 158:.\main.c      **** 
+ 159:.\main.c      ****     /***************************************************************************
+ 160:.\main.c      ****     * Main polling loop
+ 161:.\main.c      ****     ***************************************************************************/
+ 162:.\main.c      ****     while(1)
+ 163:.\main.c      ****     {
+ 164:.\main.c      ****         if(CyBle_GetState() != CYBLE_STATE_INITIALIZING)
+ 319              		.loc 1 164 0
+ 320 0086 414B     		ldr	r3, .L32+24
+ 321 0088 1B78     		ldrb	r3, [r3]
+ 322 008a 012B     		cmp	r3, #1
+ 323 008c 33D0     		beq	.L19
+ 165:.\main.c      ****         {
+ 166:.\main.c      ****             /* Enter DeepSleep mode between connection intervals */
+ 167:.\main.c      ****             lpMode = CyBle_EnterLPM(CYBLE_BLESS_DEEPSLEEP);
+ 324              		.loc 1 167 0
+ 325 008e FC1D     		add	r4, r7, #7
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 10
+
+
+ 326 0090 0320     		mov	r0, #3
+ 327 0092 FFF7FEFF 		bl	CyBle_EnterLPM
+ 328 0096 031C     		mov	r3, r0
+ 329 0098 2370     		strb	r3, [r4]
+ 168:.\main.c      ****             CyGlobalIntDisable;
+ 330              		.loc 1 168 0
+ 331              	@ 168 ".\main.c" 1
+ 332 009a 72B6     		CPSID   i
+ 333              	@ 0 "" 2
+ 169:.\main.c      ****             blessState = CyBle_GetBleSsState();
+ 334              		.loc 1 169 0
+ 335              		.code	16
+ 336 009c BC1D     		add	r4, r7, #6
+ 337 009e FFF7FEFF 		bl	CyBle_GetBleSsState
+ 338 00a2 031C     		mov	r3, r0
+ 339 00a4 2370     		strb	r3, [r4]
+ 170:.\main.c      **** 
+ 171:.\main.c      ****             if(lpMode == CYBLE_BLESS_DEEPSLEEP) 
+ 340              		.loc 1 171 0
+ 341 00a6 FB1D     		add	r3, r7, #7
+ 342 00a8 1B78     		ldrb	r3, [r3]
+ 343 00aa 032B     		cmp	r3, #3
+ 344 00ac 1CD1     		bne	.L20
+ 172:.\main.c      ****             {   
+ 173:.\main.c      ****                 if(blessState == CYBLE_BLESS_STATE_ECO_ON || blessState == CYBLE_BLESS_STATE_DEEPSL
+ 345              		.loc 1 173 0
+ 346 00ae BB1D     		add	r3, r7, #6
+ 347 00b0 1B78     		ldrb	r3, [r3]
+ 348 00b2 042B     		cmp	r3, #4
+ 349 00b4 03D0     		beq	.L21
+ 350              		.loc 1 173 0 is_stmt 0 discriminator 1
+ 351 00b6 BB1D     		add	r3, r7, #6
+ 352 00b8 1B78     		ldrb	r3, [r3]
+ 353 00ba 062B     		cmp	r3, #6
+ 354 00bc 1AD1     		bne	.L26
+ 355              	.L21:
+ 174:.\main.c      ****                 {
+ 175:.\main.c      ****                     /* Put the device into the Deep Sleep mode only when all debug information has 
+ 176:.\main.c      ****                     if((UART_DEB_SpiUartGetTxBufferSize() + UART_DEB_GET_TX_FIFO_SR_VALID) == 0u)
+ 356              		.loc 1 176 0 is_stmt 1
+ 357 00be FFF7FEFF 		bl	UART_DEB_SpiUartGetTxBufferSize
+ 358 00c2 021C     		mov	r2, r0
+ 359 00c4 324B     		ldr	r3, .L32+28
+ 360 00c6 1968     		ldr	r1, [r3]
+ 361 00c8 8023     		mov	r3, #128
+ 362 00ca 1B02     		lsl	r3, r3, #8
+ 363 00cc 0B40     		and	r3, r1
+ 364 00ce 01D0     		beq	.L23
+ 365              		.loc 1 176 0 is_stmt 0 discriminator 1
+ 366 00d0 0123     		mov	r3, #1
+ 367 00d2 00E0     		b	.L24
+ 368              	.L23:
+ 369              		.loc 1 176 0 discriminator 2
+ 370 00d4 0023     		mov	r3, #0
+ 371              	.L24:
+ 372              		.loc 1 176 0 discriminator 3
+ 373 00d6 D318     		add	r3, r2, r3
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 11
+
+
+ 374 00d8 002B     		cmp	r3, #0
+ 375 00da 02D1     		bne	.L25
+ 177:.\main.c      ****                     {
+ 178:.\main.c      ****                         CySysPmDeepSleep();
+ 376              		.loc 1 178 0 is_stmt 1
+ 377 00dc FFF7FEFF 		bl	CySysPmDeepSleep
+ 378 00e0 08E0     		b	.L26
+ 379              	.L25:
+ 179:.\main.c      ****                     }
+ 180:.\main.c      ****                     else
+ 181:.\main.c      ****                     {
+ 182:.\main.c      ****                         CySysPmSleep();
+ 380              		.loc 1 182 0
+ 381 00e2 FFF7FEFF 		bl	CySysPmSleep
+ 382 00e6 05E0     		b	.L26
+ 383              	.L20:
+ 183:.\main.c      ****                     }
+ 184:.\main.c      ****                 }
+ 185:.\main.c      ****             }
+ 186:.\main.c      ****             else
+ 187:.\main.c      ****             {
+ 188:.\main.c      ****                 if(blessState != CYBLE_BLESS_STATE_EVENT_CLOSE)
+ 384              		.loc 1 188 0
+ 385 00e8 BB1D     		add	r3, r7, #6
+ 386 00ea 1B78     		ldrb	r3, [r3]
+ 387 00ec 022B     		cmp	r3, #2
+ 388 00ee 01D0     		beq	.L26
+ 189:.\main.c      ****                 {
+ 190:.\main.c      ****                     CySysPmSleep();
+ 389              		.loc 1 190 0
+ 390 00f0 FFF7FEFF 		bl	CySysPmSleep
+ 391              	.L26:
+ 191:.\main.c      ****                 }
+ 192:.\main.c      ****             }
+ 193:.\main.c      ****             CyGlobalIntEnable;
+ 392              		.loc 1 193 0
+ 393              	@ 193 ".\main.c" 1
+ 394 00f4 62B6     		CPSIE   i
+ 395              	@ 0 "" 2
+ 396              		.code	16
+ 397              	.L19:
+ 194:.\main.c      ****         }
+ 195:.\main.c      ****         
+ 196:.\main.c      ****         /***********************************************************************
+ 197:.\main.c      ****         * Wait for connection established with Central device
+ 198:.\main.c      ****         ***********************************************************************/
+ 199:.\main.c      ****         if(CyBle_GetState() == CYBLE_STATE_CONNECTED)
+ 398              		.loc 1 199 0
+ 399 00f6 254B     		ldr	r3, .L32+24
+ 400 00f8 1B78     		ldrb	r3, [r3]
+ 401 00fa 022B     		cmp	r3, #2
+ 402 00fc 36D1     		bne	.L27
+ 200:.\main.c      ****         {
+ 201:.\main.c      ****             /*******************************************************************
+ 202:.\main.c      ****             *  Periodically measure a battery level and temperature and send 
+ 203:.\main.c      ****             *  results to the Client
+ 204:.\main.c      ****             *******************************************************************/        
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 12
+
+
+ 205:.\main.c      ****             if(mainTimer != 0u)
+ 403              		.loc 1 205 0
+ 404 00fe 254B     		ldr	r3, .L32+32
+ 405 0100 1B68     		ldr	r3, [r3]
+ 406 0102 002B     		cmp	r3, #0
+ 407 0104 12D0     		beq	.L28
+ 206:.\main.c      ****             {
+ 207:.\main.c      ****                 mainTimer = 0u;                
+ 408              		.loc 1 207 0
+ 409 0106 234B     		ldr	r3, .L32+32
+ 410 0108 0022     		mov	r2, #0
+ 411 010a 1A60     		str	r2, [r3]
+ 208:.\main.c      ****                 
+ 209:.\main.c      ****                 if(batteryMeasure == ENABLED)
+ 412              		.loc 1 209 0
+ 413 010c 224B     		ldr	r3, .L32+36
+ 414 010e 1B88     		ldrh	r3, [r3]
+ 415 0110 012B     		cmp	r3, #1
+ 416 0112 03D1     		bne	.L29
+ 210:.\main.c      ****                 {
+ 211:.\main.c      ****                     MeasureBattery();
+ 417              		.loc 1 211 0
+ 418 0114 FFF7FEFF 		bl	MeasureBattery
+ 212:.\main.c      ****                     CyBle_ProcessEvents();
+ 419              		.loc 1 212 0
+ 420 0118 FFF7FEFF 		bl	CyBle_ProcessEvents
+ 421              	.L29:
+ 213:.\main.c      ****                 }
+ 214:.\main.c      ****                 
+ 215:.\main.c      ****                 /*******************************************************************
+ 216:.\main.c      ****                 *  Simulate Blood Pressure measurement.
+ 217:.\main.c      ****                 *******************************************************************/
+ 218:.\main.c      ****                 if(0u != (blsFlag & (NTF | IND)))
+ 422              		.loc 1 218 0
+ 423 011c 1F4B     		ldr	r3, .L32+40
+ 424 011e 1B78     		ldrb	r3, [r3]
+ 425 0120 1A1C     		mov	r2, r3
+ 426 0122 0323     		mov	r3, #3
+ 427 0124 1340     		and	r3, r2
+ 428 0126 01D0     		beq	.L28
+ 219:.\main.c      ****                 {
+ 220:.\main.c      ****                     BlsSimulate();
+ 429              		.loc 1 220 0
+ 430 0128 FFF7FEFF 		bl	BlsSimulate
+ 431              	.L28:
+ 221:.\main.c      ****                 }
+ 222:.\main.c      ****             }
+ 223:.\main.c      ****             
+ 224:.\main.c      ****             /* Store bonding data to flash only when all debug information has been sent */
+ 225:.\main.c      ****             if((cyBle_pendingFlashWrite != 0u) &&
+ 432              		.loc 1 225 0
+ 433 012c 1C4B     		ldr	r3, .L32+44
+ 434 012e 1B78     		ldrb	r3, [r3]
+ 435 0130 002B     		cmp	r3, #0
+ 436 0132 1BD0     		beq	.L27
+ 226:.\main.c      ****                ((UART_DEB_SpiUartGetTxBufferSize() + UART_DEB_GET_TX_FIFO_SR_VALID) == 0u))
+ 437              		.loc 1 226 0
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 13
+
+
+ 438 0134 FFF7FEFF 		bl	UART_DEB_SpiUartGetTxBufferSize
+ 439 0138 021C     		mov	r2, r0
+ 440 013a 154B     		ldr	r3, .L32+28
+ 441 013c 1968     		ldr	r1, [r3]
+ 442 013e 8023     		mov	r3, #128
+ 443 0140 1B02     		lsl	r3, r3, #8
+ 444 0142 0B40     		and	r3, r1
+ 445 0144 01D0     		beq	.L30
+ 446              		.loc 1 226 0 is_stmt 0 discriminator 1
+ 447 0146 0123     		mov	r3, #1
+ 448 0148 00E0     		b	.L31
+ 449              	.L30:
+ 450              		.loc 1 226 0 discriminator 2
+ 451 014a 0023     		mov	r3, #0
+ 452              	.L31:
+ 453              		.loc 1 226 0 discriminator 3
+ 454 014c D318     		add	r3, r2, r3
+ 225:.\main.c      ****             if((cyBle_pendingFlashWrite != 0u) &&
+ 455              		.loc 1 225 0 is_stmt 1 discriminator 3
+ 456 014e 002B     		cmp	r3, #0
+ 457 0150 0CD1     		bne	.L27
+ 458              	.LBB3:
+ 227:.\main.c      ****             {
+ 228:.\main.c      ****                 CYBLE_API_RESULT_T apiResult;
+ 229:.\main.c      ****                 apiResult = CyBle_StoreBondingData(0u);
+ 459              		.loc 1 229 0
+ 460 0152 3C1D     		add	r4, r7, #4
+ 461 0154 0020     		mov	r0, #0
+ 462 0156 FFF7FEFF 		bl	CyBle_StoreBondingData
+ 463 015a 031C     		mov	r3, r0
+ 464 015c 2380     		strh	r3, [r4]
+ 230:.\main.c      ****                 printf("Store bonding data, status: %x \r\n", apiResult);
+ 465              		.loc 1 230 0
+ 466 015e 3B1D     		add	r3, r7, #4
+ 467 0160 1B88     		ldrh	r3, [r3]
+ 468 0162 104A     		ldr	r2, .L32+48
+ 469 0164 101C     		mov	r0, r2
+ 470 0166 191C     		mov	r1, r3
+ 471 0168 FFF7FEFF 		bl	printf
+ 472              	.L27:
+ 473              	.LBE3:
+ 231:.\main.c      ****             }
+ 232:.\main.c      ****         }
+ 233:.\main.c      **** 
+ 234:.\main.c      ****         /*******************************************************************
+ 235:.\main.c      ****         *  Process all pending BLE events in the stack
+ 236:.\main.c      ****         *******************************************************************/
+ 237:.\main.c      ****         CyBle_ProcessEvents();
+ 474              		.loc 1 237 0
+ 475 016c FFF7FEFF 		bl	CyBle_ProcessEvents
+ 238:.\main.c      ****     }
+ 476              		.loc 1 238 0
+ 477 0170 89E7     		b	.L18
+ 478              	.L33:
+ 479 0172 C046     		.align	2
+ 480              	.L32:
+ 481 0174 00000000 		.word	.LC5
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 14
+
+
+ 482 0178 00000000 		.word	AppCallBack
+ 483 017c 00000000 		.word	apiResult
+ 484 0180 2C000000 		.word	.LC9
+ 485 0184 00000000 		.word	feature
+ 486 0188 4C000000 		.word	.LC12
+ 487 018c 00000000 		.word	cyBle_state
+ 488 0190 08022440 		.word	1076101640
+ 489 0194 00000000 		.word	mainTimer
+ 490 0198 00000000 		.word	batteryMeasure
+ 491 019c 00000000 		.word	blsFlag
+ 492 01a0 00000000 		.word	cyBle_pendingFlashWrite
+ 493 01a4 80000000 		.word	.LC19
+ 494              		.cfi_endproc
+ 495              	.LFE38:
+ 496              		.size	main, .-main
+ 497              		.data
+ 498              		.type	led.7512, %object
+ 499              		.size	led.7512, 1
+ 500              	led.7512:
+ 501 0000 01       		.byte	1
+ 502              		.text
+ 503              	.Letext0:
+ 504              		.file 2 ".\\Generated_Source\\PSoC4/cytypes.h"
+ 505              		.file 3 ".\\Generated_Source\\PSoC4/CYBLE_Stack.h"
+ 506              		.file 4 ".\\Generated_Source\\PSoC4/CYBLE_bls.h"
+ 507              		.file 5 ".\\Generated_Source\\PSoC4/CYBLE_dis.h"
+ 508              		.file 6 ".\\Generated_Source\\PSoC4/CYBLE_eventHandler.h"
+ 509              		.file 7 ".\\Generated_Source\\PSoC4/CYBLE.h"
+ 510              		.file 8 ".\\blss.h"
+ 511              		.file 9 ".\\bas.h"
+ 512              		.section	.debug_info,"",%progbits
+ 513              	.Ldebug_info0:
+ 514 0000 33050000 		.4byte	0x533
+ 515 0004 0400     		.2byte	0x4
+ 516 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 517 000a 04       		.byte	0x4
+ 518 000b 01       		.uleb128 0x1
+ 519 000c A6090000 		.4byte	.LASF152
+ 520 0010 01       		.byte	0x1
+ 521 0011 9C0B0000 		.4byte	.LASF153
+ 522 0015 7C000000 		.4byte	.LASF154
+ 523 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 524 001d 00000000 		.4byte	0
+ 525 0021 00000000 		.4byte	.Ldebug_line0
+ 526 0025 02       		.uleb128 0x2
+ 527 0026 01       		.byte	0x1
+ 528 0027 06       		.byte	0x6
+ 529 0028 8C020000 		.4byte	.LASF0
+ 530 002c 02       		.uleb128 0x2
+ 531 002d 01       		.byte	0x1
+ 532 002e 08       		.byte	0x8
+ 533 002f 8F0A0000 		.4byte	.LASF1
+ 534 0033 02       		.uleb128 0x2
+ 535 0034 02       		.byte	0x2
+ 536 0035 05       		.byte	0x5
+ 537 0036 B90A0000 		.4byte	.LASF2
+ 538 003a 02       		.uleb128 0x2
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 15
+
+
+ 539 003b 02       		.byte	0x2
+ 540 003c 07       		.byte	0x7
+ 541 003d C50C0000 		.4byte	.LASF3
+ 542 0041 02       		.uleb128 0x2
+ 543 0042 04       		.byte	0x4
+ 544 0043 05       		.byte	0x5
+ 545 0044 8D010000 		.4byte	.LASF4
+ 546 0048 02       		.uleb128 0x2
+ 547 0049 04       		.byte	0x4
+ 548 004a 07       		.byte	0x7
+ 549 004b DB050000 		.4byte	.LASF5
+ 550 004f 02       		.uleb128 0x2
+ 551 0050 08       		.byte	0x8
+ 552 0051 05       		.byte	0x5
+ 553 0052 7E020000 		.4byte	.LASF6
+ 554 0056 02       		.uleb128 0x2
+ 555 0057 08       		.byte	0x8
+ 556 0058 07       		.byte	0x7
+ 557 0059 13050000 		.4byte	.LASF7
+ 558 005d 03       		.uleb128 0x3
+ 559 005e 04       		.byte	0x4
+ 560 005f 05       		.byte	0x5
+ 561 0060 696E7400 		.ascii	"int\000"
+ 562 0064 02       		.uleb128 0x2
+ 563 0065 04       		.byte	0x4
+ 564 0066 07       		.byte	0x7
+ 565 0067 290C0000 		.4byte	.LASF8
+ 566 006b 04       		.uleb128 0x4
+ 567 006c E7030000 		.4byte	.LASF9
+ 568 0070 02       		.byte	0x2
+ 569 0071 A1       		.byte	0xa1
+ 570 0072 2C000000 		.4byte	0x2c
+ 571 0076 04       		.uleb128 0x4
+ 572 0077 9D0A0000 		.4byte	.LASF10
+ 573 007b 02       		.byte	0x2
+ 574 007c A2       		.byte	0xa2
+ 575 007d 3A000000 		.4byte	0x3a
+ 576 0081 04       		.uleb128 0x4
+ 577 0082 5F040000 		.4byte	.LASF11
+ 578 0086 02       		.byte	0x2
+ 579 0087 A3       		.byte	0xa3
+ 580 0088 48000000 		.4byte	0x48
+ 581 008c 02       		.uleb128 0x2
+ 582 008d 04       		.byte	0x4
+ 583 008e 04       		.byte	0x4
+ 584 008f 88090000 		.4byte	.LASF12
+ 585 0093 02       		.uleb128 0x2
+ 586 0094 08       		.byte	0x8
+ 587 0095 04       		.byte	0x4
+ 588 0096 23040000 		.4byte	.LASF13
+ 589 009a 02       		.uleb128 0x2
+ 590 009b 01       		.byte	0x1
+ 591 009c 08       		.byte	0x8
+ 592 009d B90B0000 		.4byte	.LASF14
+ 593 00a1 05       		.uleb128 0x5
+ 594 00a2 A1070000 		.4byte	.LASF15
+ 595 00a6 02       		.byte	0x2
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 16
+
+
+ 596 00a7 4D01     		.2byte	0x14d
+ 597 00a9 AD000000 		.4byte	0xad
+ 598 00ad 06       		.uleb128 0x6
+ 599 00ae 81000000 		.4byte	0x81
+ 600 00b2 02       		.uleb128 0x2
+ 601 00b3 04       		.byte	0x4
+ 602 00b4 07       		.byte	0x7
+ 603 00b5 44080000 		.4byte	.LASF16
+ 604 00b9 07       		.uleb128 0x7
+ 605 00ba 04       		.byte	0x4
+ 606 00bb 08       		.uleb128 0x8
+ 607 00bc 01       		.byte	0x1
+ 608 00bd 03       		.byte	0x3
+ 609 00be 58       		.byte	0x58
+ 610 00bf 2B020000 		.4byte	0x22b
+ 611 00c3 09       		.uleb128 0x9
+ 612 00c4 95060000 		.4byte	.LASF17
+ 613 00c8 00       		.sleb128 0
+ 614 00c9 09       		.uleb128 0x9
+ 615 00ca 98020000 		.4byte	.LASF18
+ 616 00ce 01       		.sleb128 1
+ 617 00cf 09       		.uleb128 0x9
+ 618 00d0 7B010000 		.4byte	.LASF19
+ 619 00d4 02       		.sleb128 2
+ 620 00d5 09       		.uleb128 0x9
+ 621 00d6 AC0C0000 		.4byte	.LASF20
+ 622 00da 03       		.sleb128 3
+ 623 00db 09       		.uleb128 0x9
+ 624 00dc DE010000 		.4byte	.LASF21
+ 625 00e0 04       		.sleb128 4
+ 626 00e1 09       		.uleb128 0x9
+ 627 00e2 23000000 		.4byte	.LASF22
+ 628 00e6 05       		.sleb128 5
+ 629 00e7 09       		.uleb128 0x9
+ 630 00e8 A7070000 		.4byte	.LASF23
+ 631 00ec 20       		.sleb128 32
+ 632 00ed 09       		.uleb128 0x9
+ 633 00ee EA020000 		.4byte	.LASF24
+ 634 00f2 21       		.sleb128 33
+ 635 00f3 09       		.uleb128 0x9
+ 636 00f4 CA060000 		.4byte	.LASF25
+ 637 00f8 22       		.sleb128 34
+ 638 00f9 09       		.uleb128 0x9
+ 639 00fa 44070000 		.4byte	.LASF26
+ 640 00fe 23       		.sleb128 35
+ 641 00ff 09       		.uleb128 0x9
+ 642 0100 B8080000 		.4byte	.LASF27
+ 643 0104 24       		.sleb128 36
+ 644 0105 09       		.uleb128 0x9
+ 645 0106 66080000 		.4byte	.LASF28
+ 646 010a 25       		.sleb128 37
+ 647 010b 09       		.uleb128 0x9
+ 648 010c 9C030000 		.4byte	.LASF29
+ 649 0110 26       		.sleb128 38
+ 650 0111 09       		.uleb128 0x9
+ 651 0112 EE060000 		.4byte	.LASF30
+ 652 0116 27       		.sleb128 39
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 17
+
+
+ 653 0117 09       		.uleb128 0x9
+ 654 0118 070C0000 		.4byte	.LASF31
+ 655 011c 28       		.sleb128 40
+ 656 011d 09       		.uleb128 0x9
+ 657 011e 49020000 		.4byte	.LASF32
+ 658 0122 29       		.sleb128 41
+ 659 0123 09       		.uleb128 0x9
+ 660 0124 E3000000 		.4byte	.LASF33
+ 661 0128 2A       		.sleb128 42
+ 662 0129 09       		.uleb128 0x9
+ 663 012a F3010000 		.4byte	.LASF34
+ 664 012e 2B       		.sleb128 43
+ 665 012f 09       		.uleb128 0x9
+ 666 0130 7A0E0000 		.4byte	.LASF35
+ 667 0134 2C       		.sleb128 44
+ 668 0135 09       		.uleb128 0x9
+ 669 0136 9A040000 		.4byte	.LASF36
+ 670 013a C000     		.sleb128 64
+ 671 013c 09       		.uleb128 0x9
+ 672 013d 6A070000 		.4byte	.LASF37
+ 673 0141 C100     		.sleb128 65
+ 674 0143 09       		.uleb128 0x9
+ 675 0144 78050000 		.4byte	.LASF38
+ 676 0148 C200     		.sleb128 66
+ 677 014a 09       		.uleb128 0x9
+ 678 014b 140D0000 		.4byte	.LASF39
+ 679 014f C300     		.sleb128 67
+ 680 0151 09       		.uleb128 0x9
+ 681 0152 09060000 		.4byte	.LASF40
+ 682 0156 C400     		.sleb128 68
+ 683 0158 09       		.uleb128 0x9
+ 684 0159 61090000 		.4byte	.LASF41
+ 685 015d C500     		.sleb128 69
+ 686 015f 09       		.uleb128 0x9
+ 687 0160 23080000 		.4byte	.LASF42
+ 688 0164 C600     		.sleb128 70
+ 689 0166 09       		.uleb128 0x9
+ 690 0167 AC060000 		.4byte	.LASF43
+ 691 016b C700     		.sleb128 71
+ 692 016d 09       		.uleb128 0x9
+ 693 016e 3E0E0000 		.4byte	.LASF44
+ 694 0172 C800     		.sleb128 72
+ 695 0174 09       		.uleb128 0x9
+ 696 0175 01030000 		.4byte	.LASF45
+ 697 0179 C900     		.sleb128 73
+ 698 017b 09       		.uleb128 0x9
+ 699 017c 7A0D0000 		.4byte	.LASF46
+ 700 0180 CA00     		.sleb128 74
+ 701 0182 09       		.uleb128 0x9
+ 702 0183 2D010000 		.4byte	.LASF47
+ 703 0187 CB00     		.sleb128 75
+ 704 0189 09       		.uleb128 0x9
+ 705 018a 0D070000 		.4byte	.LASF48
+ 706 018e CC00     		.sleb128 76
+ 707 0190 09       		.uleb128 0x9
+ 708 0191 8A080000 		.4byte	.LASF49
+ 709 0195 CD00     		.sleb128 77
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 18
+
+
+ 710 0197 09       		.uleb128 0x9
+ 711 0198 34030000 		.4byte	.LASF50
+ 712 019c CE00     		.sleb128 78
+ 713 019e 09       		.uleb128 0x9
+ 714 019f 240B0000 		.4byte	.LASF51
+ 715 01a3 CF00     		.sleb128 79
+ 716 01a5 09       		.uleb128 0x9
+ 717 01a6 4C010000 		.4byte	.LASF52
+ 718 01aa D000     		.sleb128 80
+ 719 01ac 09       		.uleb128 0x9
+ 720 01ad 04040000 		.4byte	.LASF53
+ 721 01b1 D100     		.sleb128 81
+ 722 01b3 09       		.uleb128 0x9
+ 723 01b4 F1080000 		.4byte	.LASF54
+ 724 01b8 D200     		.sleb128 82
+ 725 01ba 09       		.uleb128 0x9
+ 726 01bb C30A0000 		.4byte	.LASF55
+ 727 01bf D300     		.sleb128 83
+ 728 01c1 09       		.uleb128 0x9
+ 729 01c2 5D0B0000 		.4byte	.LASF56
+ 730 01c6 D400     		.sleb128 84
+ 731 01c8 09       		.uleb128 0x9
+ 732 01c9 27060000 		.4byte	.LASF57
+ 733 01cd D500     		.sleb128 85
+ 734 01cf 09       		.uleb128 0x9
+ 735 01d0 B4040000 		.4byte	.LASF58
+ 736 01d4 F000     		.sleb128 112
+ 737 01d6 09       		.uleb128 0x9
+ 738 01d7 F20E0000 		.4byte	.LASF59
+ 739 01db F100     		.sleb128 113
+ 740 01dd 09       		.uleb128 0x9
+ 741 01de 67030000 		.4byte	.LASF60
+ 742 01e2 F200     		.sleb128 114
+ 743 01e4 09       		.uleb128 0x9
+ 744 01e5 05080000 		.4byte	.LASF61
+ 745 01e9 F300     		.sleb128 115
+ 746 01eb 09       		.uleb128 0x9
+ 747 01ec 43090000 		.4byte	.LASF62
+ 748 01f0 F400     		.sleb128 116
+ 749 01f2 09       		.uleb128 0x9
+ 750 01f3 AC0E0000 		.4byte	.LASF63
+ 751 01f7 F500     		.sleb128 117
+ 752 01f9 09       		.uleb128 0x9
+ 753 01fa 0C010000 		.4byte	.LASF64
+ 754 01fe F600     		.sleb128 118
+ 755 0200 09       		.uleb128 0x9
+ 756 0201 5D000000 		.4byte	.LASF65
+ 757 0205 F700     		.sleb128 119
+ 758 0207 09       		.uleb128 0x9
+ 759 0208 00000000 		.4byte	.LASF66
+ 760 020c F800     		.sleb128 120
+ 761 020e 09       		.uleb128 0x9
+ 762 020f 360C0000 		.4byte	.LASF67
+ 763 0213 F900     		.sleb128 121
+ 764 0215 09       		.uleb128 0x9
+ 765 0216 DA040000 		.4byte	.LASF68
+ 766 021a FA00     		.sleb128 122
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 19
+
+
+ 767 021c 09       		.uleb128 0x9
+ 768 021d 12020000 		.4byte	.LASF69
+ 769 0221 FA01     		.sleb128 250
+ 770 0223 09       		.uleb128 0x9
+ 771 0224 7D040000 		.4byte	.LASF70
+ 772 0228 FF01     		.sleb128 255
+ 773 022a 00       		.byte	0
+ 774 022b 0A       		.uleb128 0xa
+ 775 022c 02       		.byte	0x2
+ 776 022d 03       		.byte	0x3
+ 777 022e 9A01     		.2byte	0x19a
+ 778 0230 F7020000 		.4byte	0x2f7
+ 779 0234 09       		.uleb128 0x9
+ 780 0235 8B040000 		.4byte	.LASF71
+ 781 0239 00       		.sleb128 0
+ 782 023a 09       		.uleb128 0x9
+ 783 023b 2A040000 		.4byte	.LASF72
+ 784 023f 01       		.sleb128 1
+ 785 0240 09       		.uleb128 0x9
+ 786 0241 F60C0000 		.4byte	.LASF73
+ 787 0245 02       		.sleb128 2
+ 788 0246 09       		.uleb128 0x9
+ 789 0247 2A050000 		.4byte	.LASF74
+ 790 024b 03       		.sleb128 3
+ 791 024c 09       		.uleb128 0x9
+ 792 024d BB010000 		.4byte	.LASF75
+ 793 0251 04       		.sleb128 4
+ 794 0252 09       		.uleb128 0x9
+ 795 0253 4F050000 		.4byte	.LASF76
+ 796 0257 05       		.sleb128 5
+ 797 0258 09       		.uleb128 0x9
+ 798 0259 E40A0000 		.4byte	.LASF77
+ 799 025d 06       		.sleb128 6
+ 800 025e 09       		.uleb128 0x9
+ 801 025f CD020000 		.4byte	.LASF78
+ 802 0263 07       		.sleb128 7
+ 803 0264 09       		.uleb128 0x9
+ 804 0265 7E0B0000 		.4byte	.LASF79
+ 805 0269 08       		.sleb128 8
+ 806 026a 09       		.uleb128 0x9
+ 807 026b 650E0000 		.4byte	.LASF80
+ 808 026f 09       		.sleb128 9
+ 809 0270 09       		.uleb128 0x9
+ 810 0271 520A0000 		.4byte	.LASF81
+ 811 0275 0A       		.sleb128 10
+ 812 0276 09       		.uleb128 0x9
+ 813 0277 E70B0000 		.4byte	.LASF82
+ 814 027b 0B       		.sleb128 11
+ 815 027c 09       		.uleb128 0x9
+ 816 027d ED030000 		.4byte	.LASF83
+ 817 0281 0C       		.sleb128 12
+ 818 0282 09       		.uleb128 0x9
+ 819 0283 96010000 		.4byte	.LASF84
+ 820 0287 0D       		.sleb128 13
+ 821 0288 09       		.uleb128 0x9
+ 822 0289 96050000 		.4byte	.LASF85
+ 823 028d 0E       		.sleb128 14
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 20
+
+
+ 824 028e 09       		.uleb128 0x9
+ 825 028f ED0D0000 		.4byte	.LASF86
+ 826 0293 0F       		.sleb128 15
+ 827 0294 09       		.uleb128 0x9
+ 828 0295 7E0C0000 		.4byte	.LASF87
+ 829 0299 10       		.sleb128 16
+ 830 029a 09       		.uleb128 0x9
+ 831 029b 52060000 		.4byte	.LASF88
+ 832 029f 11       		.sleb128 17
+ 833 02a0 09       		.uleb128 0x9
+ 834 02a1 C4030000 		.4byte	.LASF89
+ 835 02a5 12       		.sleb128 18
+ 836 02a6 09       		.uleb128 0x9
+ 837 02a7 4C0F0000 		.4byte	.LASF90
+ 838 02ab 13       		.sleb128 19
+ 839 02ac 09       		.uleb128 0x9
+ 840 02ad AB020000 		.4byte	.LASF91
+ 841 02b1 27       		.sleb128 39
+ 842 02b2 09       		.uleb128 0x9
+ 843 02b3 590C0000 		.4byte	.LASF92
+ 844 02b7 28       		.sleb128 40
+ 845 02b8 09       		.uleb128 0x9
+ 846 02b9 C30D0000 		.4byte	.LASF93
+ 847 02bd 29       		.sleb128 41
+ 848 02be 09       		.uleb128 0x9
+ 849 02bf F5070000 		.4byte	.LASF94
+ 850 02c3 FF01     		.sleb128 255
+ 851 02c5 09       		.uleb128 0x9
+ 852 02c6 52030000 		.4byte	.LASF95
+ 853 02ca 8002     		.sleb128 256
+ 854 02cc 09       		.uleb128 0x9
+ 855 02cd CD0E0000 		.4byte	.LASF96
+ 856 02d1 8102     		.sleb128 257
+ 857 02d3 09       		.uleb128 0x9
+ 858 02d4 DF070000 		.4byte	.LASF97
+ 859 02d8 8202     		.sleb128 258
+ 860 02da 09       		.uleb128 0x9
+ 861 02db 7C060000 		.4byte	.LASF98
+ 862 02df 8302     		.sleb128 259
+ 863 02e1 09       		.uleb128 0x9
+ 864 02e2 12090000 		.4byte	.LASF99
+ 865 02e6 8402     		.sleb128 260
+ 866 02e8 09       		.uleb128 0x9
+ 867 02e9 6C0A0000 		.4byte	.LASF100
+ 868 02ed 8502     		.sleb128 261
+ 869 02ef 09       		.uleb128 0x9
+ 870 02f0 1A030000 		.4byte	.LASF101
+ 871 02f4 8602     		.sleb128 262
+ 872 02f6 00       		.byte	0
+ 873 02f7 05       		.uleb128 0x5
+ 874 02f8 DE080000 		.4byte	.LASF102
+ 875 02fc 03       		.byte	0x3
+ 876 02fd F401     		.2byte	0x1f4
+ 877 02ff 2B020000 		.4byte	0x22b
+ 878 0303 0A       		.uleb128 0xa
+ 879 0304 01       		.byte	0x1
+ 880 0305 03       		.byte	0x3
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 21
+
+
+ 881 0306 F801     		.2byte	0x1f8
+ 882 0308 2C030000 		.4byte	0x32c
+ 883 030c 09       		.uleb128 0x9
+ 884 030d 1D0F0000 		.4byte	.LASF103
+ 885 0311 01       		.sleb128 1
+ 886 0312 09       		.uleb128 0x9
+ 887 0313 BE0B0000 		.4byte	.LASF104
+ 888 0317 02       		.sleb128 2
+ 889 0318 09       		.uleb128 0x9
+ 890 0319 280E0000 		.4byte	.LASF105
+ 891 031d 03       		.sleb128 3
+ 892 031e 09       		.uleb128 0x9
+ 893 031f 3D0D0000 		.4byte	.LASF106
+ 894 0323 04       		.sleb128 4
+ 895 0324 09       		.uleb128 0x9
+ 896 0325 F5050000 		.4byte	.LASF107
+ 897 0329 FF01     		.sleb128 255
+ 898 032b 00       		.byte	0
+ 899 032c 05       		.uleb128 0x5
+ 900 032d 6B010000 		.4byte	.LASF108
+ 901 0331 03       		.byte	0x3
+ 902 0332 1402     		.2byte	0x214
+ 903 0334 03030000 		.4byte	0x303
+ 904 0338 0A       		.uleb128 0xa
+ 905 0339 01       		.byte	0x1
+ 906 033a 03       		.byte	0x3
+ 907 033b 1802     		.2byte	0x218
+ 908 033d 73030000 		.4byte	0x373
+ 909 0341 09       		.uleb128 0x9
+ 910 0342 30020000 		.4byte	.LASF109
+ 911 0346 01       		.sleb128 1
+ 912 0347 09       		.uleb128 0x9
+ 913 0348 D80C0000 		.4byte	.LASF110
+ 914 034c 02       		.sleb128 2
+ 915 034d 09       		.uleb128 0x9
+ 916 034e 3A0A0000 		.4byte	.LASF111
+ 917 0352 03       		.sleb128 3
+ 918 0353 09       		.uleb128 0x9
+ 919 0354 530D0000 		.4byte	.LASF112
+ 920 0358 04       		.sleb128 4
+ 921 0359 09       		.uleb128 0x9
+ 922 035a A60D0000 		.4byte	.LASF113
+ 923 035e 05       		.sleb128 5
+ 924 035f 09       		.uleb128 0x9
+ 925 0360 BF050000 		.4byte	.LASF114
+ 926 0364 06       		.sleb128 6
+ 927 0365 09       		.uleb128 0x9
+ 928 0366 85070000 		.4byte	.LASF115
+ 929 036a 07       		.sleb128 7
+ 930 036b 09       		.uleb128 0x9
+ 931 036c 430B0000 		.4byte	.LASF116
+ 932 0370 FF01     		.sleb128 255
+ 933 0372 00       		.byte	0
+ 934 0373 05       		.uleb128 0x5
+ 935 0374 A50B0000 		.4byte	.LASF117
+ 936 0378 03       		.byte	0x3
+ 937 0379 2102     		.2byte	0x221
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 22
+
+
+ 938 037b 38030000 		.4byte	0x338
+ 939 037f 08       		.uleb128 0x8
+ 940 0380 01       		.byte	0x1
+ 941 0381 04       		.byte	0x4
+ 942 0382 1D       		.byte	0x1d
+ 943 0383 A0030000 		.4byte	0x3a0
+ 944 0387 09       		.uleb128 0x9
+ 945 0388 DF0D0000 		.4byte	.LASF118
+ 946 038c 00       		.sleb128 0
+ 947 038d 09       		.uleb128 0x9
+ 948 038e 9E0E0000 		.4byte	.LASF119
+ 949 0392 01       		.sleb128 1
+ 950 0393 09       		.uleb128 0x9
+ 951 0394 980D0000 		.4byte	.LASF120
+ 952 0398 02       		.sleb128 2
+ 953 0399 09       		.uleb128 0x9
+ 954 039a FE040000 		.4byte	.LASF121
+ 955 039e 03       		.sleb128 3
+ 956 039f 00       		.byte	0
+ 957 03a0 08       		.uleb128 0x8
+ 958 03a1 01       		.byte	0x1
+ 959 03a2 05       		.byte	0x5
+ 960 03a3 1D       		.byte	0x1d
+ 961 03a4 E5030000 		.4byte	0x3e5
+ 962 03a8 09       		.uleb128 0x9
+ 963 03a9 300F0000 		.4byte	.LASF122
+ 964 03ad 00       		.sleb128 0
+ 965 03ae 09       		.uleb128 0x9
+ 966 03af D00B0000 		.4byte	.LASF123
+ 967 03b3 01       		.sleb128 1
+ 968 03b4 09       		.uleb128 0x9
+ 969 03b5 220A0000 		.4byte	.LASF124
+ 970 03b9 02       		.sleb128 2
+ 971 03ba 09       		.uleb128 0x9
+ 972 03bb 66040000 		.4byte	.LASF125
+ 973 03bf 03       		.sleb128 3
+ 974 03c0 09       		.uleb128 0x9
+ 975 03c1 48040000 		.4byte	.LASF126
+ 976 03c5 04       		.sleb128 4
+ 977 03c6 09       		.uleb128 0x9
+ 978 03c7 FE0A0000 		.4byte	.LASF127
+ 979 03cb 05       		.sleb128 5
+ 980 03cc 09       		.uleb128 0x9
+ 981 03cd CB070000 		.4byte	.LASF128
+ 982 03d1 06       		.sleb128 6
+ 983 03d2 09       		.uleb128 0x9
+ 984 03d3 2B090000 		.4byte	.LASF129
+ 985 03d7 07       		.sleb128 7
+ 986 03d8 09       		.uleb128 0x9
+ 987 03d9 27070000 		.4byte	.LASF130
+ 988 03dd 08       		.sleb128 8
+ 989 03de 09       		.uleb128 0x9
+ 990 03df A40A0000 		.4byte	.LASF131
+ 991 03e3 09       		.sleb128 9
+ 992 03e4 00       		.byte	0
+ 993 03e5 0A       		.uleb128 0xa
+ 994 03e6 01       		.byte	0x1
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 23
+
+
+ 995 03e7 06       		.byte	0x6
+ 996 03e8 9505     		.2byte	0x595
+ 997 03ea 0D040000 		.4byte	0x40d
+ 998 03ee 09       		.uleb128 0x9
+ 999 03ef 49000000 		.4byte	.LASF132
+ 1000 03f3 00       		.sleb128 0
+ 1001 03f4 09       		.uleb128 0x9
+ 1002 03f5 4D080000 		.4byte	.LASF133
+ 1003 03f9 01       		.sleb128 1
+ 1004 03fa 09       		.uleb128 0x9
+ 1005 03fb 120E0000 		.4byte	.LASF134
+ 1006 03ff 02       		.sleb128 2
+ 1007 0400 09       		.uleb128 0x9
+ 1008 0401 66020000 		.4byte	.LASF135
+ 1009 0405 03       		.sleb128 3
+ 1010 0406 09       		.uleb128 0x9
+ 1011 0407 83030000 		.4byte	.LASF136
+ 1012 040b 04       		.sleb128 4
+ 1013 040c 00       		.byte	0
+ 1014 040d 05       		.uleb128 0x5
+ 1015 040e 6C0D0000 		.4byte	.LASF137
+ 1016 0412 06       		.byte	0x6
+ 1017 0413 A305     		.2byte	0x5a3
+ 1018 0415 E5030000 		.4byte	0x3e5
+ 1019 0419 0B       		.uleb128 0xb
+ 1020 041a A4080000 		.4byte	.LASF140
+ 1021 041e 01       		.byte	0x1
+ 1022 041f 29       		.byte	0x29
+ 1023 0420 00000000 		.4byte	.LFB35
+ 1024 0424 44000000 		.4byte	.LFE35-.LFB35
+ 1025 0428 01       		.uleb128 0x1
+ 1026 0429 9C       		.byte	0x9c
+ 1027 042a 4B040000 		.4byte	0x44b
+ 1028 042e 0C       		.uleb128 0xc
+ 1029 042f 76060000 		.4byte	.LASF138
+ 1030 0433 01       		.byte	0x1
+ 1031 0434 29       		.byte	0x29
+ 1032 0435 81000000 		.4byte	0x81
+ 1033 0439 02       		.uleb128 0x2
+ 1034 043a 91       		.byte	0x91
+ 1035 043b 74       		.sleb128 -12
+ 1036 043c 0C       		.uleb128 0xc
+ 1037 043d 320D0000 		.4byte	.LASF139
+ 1038 0441 01       		.byte	0x1
+ 1039 0442 29       		.byte	0x29
+ 1040 0443 B9000000 		.4byte	0xb9
+ 1041 0447 02       		.uleb128 0x2
+ 1042 0448 91       		.byte	0x91
+ 1043 0449 70       		.sleb128 -16
+ 1044 044a 00       		.byte	0
+ 1045 044b 0B       		.uleb128 0xb
+ 1046 044c E20E0000 		.4byte	.LASF141
+ 1047 0450 01       		.byte	0x1
+ 1048 0451 4B       		.byte	0x4b
+ 1049 0452 00000000 		.4byte	.LFB36
+ 1050 0456 58000000 		.4byte	.LFE36-.LFB36
+ 1051 045a 01       		.uleb128 0x1
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 24
+
+
+ 1052 045b 9C       		.byte	0x9c
+ 1053 045c 7C040000 		.4byte	0x47c
+ 1054 0460 0D       		.uleb128 0xd
+ 1055 0461 12000000 		.4byte	.LBB2
+ 1056 0465 34000000 		.4byte	.LBE2-.LBB2
+ 1057 0469 0E       		.uleb128 0xe
+ 1058 046a 6C656400 		.ascii	"led\000"
+ 1059 046e 01       		.byte	0x1
+ 1060 046f 4F       		.byte	0x4f
+ 1061 0470 6B000000 		.4byte	0x6b
+ 1062 0474 05       		.uleb128 0x5
+ 1063 0475 03       		.byte	0x3
+ 1064 0476 00000000 		.4byte	led.7512
+ 1065 047a 00       		.byte	0
+ 1066 047b 00       		.byte	0
+ 1067 047c 0F       		.uleb128 0xf
+ 1068 047d 80080000 		.4byte	.LASF155
+ 1069 0481 01       		.byte	0x1
+ 1070 0482 69       		.byte	0x69
+ 1071 0483 00000000 		.4byte	.LFB37
+ 1072 0487 4C000000 		.4byte	.LFE37-.LFB37
+ 1073 048b 01       		.uleb128 0x1
+ 1074 048c 9C       		.byte	0x9c
+ 1075 048d 10       		.uleb128 0x10
+ 1076 048e 180F0000 		.4byte	.LASF142
+ 1077 0492 01       		.byte	0x1
+ 1078 0493 7F       		.byte	0x7f
+ 1079 0494 5D000000 		.4byte	0x5d
+ 1080 0498 00000000 		.4byte	.LFB38
+ 1081 049c A8010000 		.4byte	.LFE38-.LFB38
+ 1082 04a0 01       		.uleb128 0x1
+ 1083 04a1 9C       		.byte	0x9c
+ 1084 04a2 DB040000 		.4byte	0x4db
+ 1085 04a6 11       		.uleb128 0x11
+ 1086 04a7 4B060000 		.4byte	.LASF143
+ 1087 04ab 01       		.byte	0x1
+ 1088 04ac 81       		.byte	0x81
+ 1089 04ad 2C030000 		.4byte	0x32c
+ 1090 04b1 02       		.uleb128 0x2
+ 1091 04b2 91       		.byte	0x91
+ 1092 04b3 6F       		.sleb128 -17
+ 1093 04b4 11       		.uleb128 0x11
+ 1094 04b5 6D050000 		.4byte	.LASF144
+ 1095 04b9 01       		.byte	0x1
+ 1096 04ba 82       		.byte	0x82
+ 1097 04bb 73030000 		.4byte	0x373
+ 1098 04bf 02       		.uleb128 0x2
+ 1099 04c0 91       		.byte	0x91
+ 1100 04c1 6E       		.sleb128 -18
+ 1101 04c2 0D       		.uleb128 0xd
+ 1102 04c3 52010000 		.4byte	.LBB3
+ 1103 04c7 1A000000 		.4byte	.LBE3-.LBB3
+ 1104 04cb 11       		.uleb128 0x11
+ 1105 04cc D4080000 		.4byte	.LASF145
+ 1106 04d0 01       		.byte	0x1
+ 1107 04d1 E4       		.byte	0xe4
+ 1108 04d2 F7020000 		.4byte	0x2f7
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 25
+
+
+ 1109 04d6 02       		.uleb128 0x2
+ 1110 04d7 91       		.byte	0x91
+ 1111 04d8 6C       		.sleb128 -20
+ 1112 04d9 00       		.byte	0
+ 1113 04da 00       		.byte	0
+ 1114 04db 12       		.uleb128 0x12
+ 1115 04dc 8E090000 		.4byte	.LASF146
+ 1116 04e0 07       		.byte	0x7
+ 1117 04e1 8C01     		.2byte	0x18c
+ 1118 04e3 6B000000 		.4byte	0x6b
+ 1119 04e7 12       		.uleb128 0x12
+ 1120 04e8 38070000 		.4byte	.LASF147
+ 1121 04ec 06       		.byte	0x6
+ 1122 04ed 2207     		.2byte	0x722
+ 1123 04ef 0D040000 		.4byte	0x40d
+ 1124 04f3 13       		.uleb128 0x13
+ 1125 04f4 D4080000 		.4byte	.LASF145
+ 1126 04f8 01       		.byte	0x1
+ 1127 04f9 1A       		.byte	0x1a
+ 1128 04fa F7020000 		.4byte	0x2f7
+ 1129 04fe 05       		.uleb128 0x5
+ 1130 04ff 03       		.byte	0x3
+ 1131 0500 00000000 		.4byte	apiResult
+ 1132 0504 13       		.uleb128 0x13
+ 1133 0505 3F000000 		.4byte	.LASF148
+ 1134 0509 01       		.byte	0x1
+ 1135 050a 19       		.byte	0x19
+ 1136 050b AD000000 		.4byte	0xad
+ 1137 050f 05       		.uleb128 0x5
+ 1138 0510 03       		.byte	0x3
+ 1139 0511 00000000 		.4byte	mainTimer
+ 1140 0515 14       		.uleb128 0x14
+ 1141 0516 ED050000 		.4byte	.LASF149
+ 1142 051a 08       		.byte	0x8
+ 1143 051b 6E       		.byte	0x6e
+ 1144 051c 76000000 		.4byte	0x76
+ 1145 0520 14       		.uleb128 0x14
+ 1146 0521 B0080000 		.4byte	.LASF150
+ 1147 0525 08       		.byte	0x8
+ 1148 0526 6F       		.byte	0x6f
+ 1149 0527 6B000000 		.4byte	0x6b
+ 1150 052b 14       		.uleb128 0x14
+ 1151 052c 150B0000 		.4byte	.LASF151
+ 1152 0530 09       		.byte	0x9
+ 1153 0531 47       		.byte	0x47
+ 1154 0532 76000000 		.4byte	0x76
+ 1155 0536 00       		.byte	0
+ 1156              		.section	.debug_abbrev,"",%progbits
+ 1157              	.Ldebug_abbrev0:
+ 1158 0000 01       		.uleb128 0x1
+ 1159 0001 11       		.uleb128 0x11
+ 1160 0002 01       		.byte	0x1
+ 1161 0003 25       		.uleb128 0x25
+ 1162 0004 0E       		.uleb128 0xe
+ 1163 0005 13       		.uleb128 0x13
+ 1164 0006 0B       		.uleb128 0xb
+ 1165 0007 03       		.uleb128 0x3
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 26
+
+
+ 1166 0008 0E       		.uleb128 0xe
+ 1167 0009 1B       		.uleb128 0x1b
+ 1168 000a 0E       		.uleb128 0xe
+ 1169 000b 55       		.uleb128 0x55
+ 1170 000c 17       		.uleb128 0x17
+ 1171 000d 11       		.uleb128 0x11
+ 1172 000e 01       		.uleb128 0x1
+ 1173 000f 10       		.uleb128 0x10
+ 1174 0010 17       		.uleb128 0x17
+ 1175 0011 00       		.byte	0
+ 1176 0012 00       		.byte	0
+ 1177 0013 02       		.uleb128 0x2
+ 1178 0014 24       		.uleb128 0x24
+ 1179 0015 00       		.byte	0
+ 1180 0016 0B       		.uleb128 0xb
+ 1181 0017 0B       		.uleb128 0xb
+ 1182 0018 3E       		.uleb128 0x3e
+ 1183 0019 0B       		.uleb128 0xb
+ 1184 001a 03       		.uleb128 0x3
+ 1185 001b 0E       		.uleb128 0xe
+ 1186 001c 00       		.byte	0
+ 1187 001d 00       		.byte	0
+ 1188 001e 03       		.uleb128 0x3
+ 1189 001f 24       		.uleb128 0x24
+ 1190 0020 00       		.byte	0
+ 1191 0021 0B       		.uleb128 0xb
+ 1192 0022 0B       		.uleb128 0xb
+ 1193 0023 3E       		.uleb128 0x3e
+ 1194 0024 0B       		.uleb128 0xb
+ 1195 0025 03       		.uleb128 0x3
+ 1196 0026 08       		.uleb128 0x8
+ 1197 0027 00       		.byte	0
+ 1198 0028 00       		.byte	0
+ 1199 0029 04       		.uleb128 0x4
+ 1200 002a 16       		.uleb128 0x16
+ 1201 002b 00       		.byte	0
+ 1202 002c 03       		.uleb128 0x3
+ 1203 002d 0E       		.uleb128 0xe
+ 1204 002e 3A       		.uleb128 0x3a
+ 1205 002f 0B       		.uleb128 0xb
+ 1206 0030 3B       		.uleb128 0x3b
+ 1207 0031 0B       		.uleb128 0xb
+ 1208 0032 49       		.uleb128 0x49
+ 1209 0033 13       		.uleb128 0x13
+ 1210 0034 00       		.byte	0
+ 1211 0035 00       		.byte	0
+ 1212 0036 05       		.uleb128 0x5
+ 1213 0037 16       		.uleb128 0x16
+ 1214 0038 00       		.byte	0
+ 1215 0039 03       		.uleb128 0x3
+ 1216 003a 0E       		.uleb128 0xe
+ 1217 003b 3A       		.uleb128 0x3a
+ 1218 003c 0B       		.uleb128 0xb
+ 1219 003d 3B       		.uleb128 0x3b
+ 1220 003e 05       		.uleb128 0x5
+ 1221 003f 49       		.uleb128 0x49
+ 1222 0040 13       		.uleb128 0x13
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 27
+
+
+ 1223 0041 00       		.byte	0
+ 1224 0042 00       		.byte	0
+ 1225 0043 06       		.uleb128 0x6
+ 1226 0044 35       		.uleb128 0x35
+ 1227 0045 00       		.byte	0
+ 1228 0046 49       		.uleb128 0x49
+ 1229 0047 13       		.uleb128 0x13
+ 1230 0048 00       		.byte	0
+ 1231 0049 00       		.byte	0
+ 1232 004a 07       		.uleb128 0x7
+ 1233 004b 0F       		.uleb128 0xf
+ 1234 004c 00       		.byte	0
+ 1235 004d 0B       		.uleb128 0xb
+ 1236 004e 0B       		.uleb128 0xb
+ 1237 004f 00       		.byte	0
+ 1238 0050 00       		.byte	0
+ 1239 0051 08       		.uleb128 0x8
+ 1240 0052 04       		.uleb128 0x4
+ 1241 0053 01       		.byte	0x1
+ 1242 0054 0B       		.uleb128 0xb
+ 1243 0055 0B       		.uleb128 0xb
+ 1244 0056 3A       		.uleb128 0x3a
+ 1245 0057 0B       		.uleb128 0xb
+ 1246 0058 3B       		.uleb128 0x3b
+ 1247 0059 0B       		.uleb128 0xb
+ 1248 005a 01       		.uleb128 0x1
+ 1249 005b 13       		.uleb128 0x13
+ 1250 005c 00       		.byte	0
+ 1251 005d 00       		.byte	0
+ 1252 005e 09       		.uleb128 0x9
+ 1253 005f 28       		.uleb128 0x28
+ 1254 0060 00       		.byte	0
+ 1255 0061 03       		.uleb128 0x3
+ 1256 0062 0E       		.uleb128 0xe
+ 1257 0063 1C       		.uleb128 0x1c
+ 1258 0064 0D       		.uleb128 0xd
+ 1259 0065 00       		.byte	0
+ 1260 0066 00       		.byte	0
+ 1261 0067 0A       		.uleb128 0xa
+ 1262 0068 04       		.uleb128 0x4
+ 1263 0069 01       		.byte	0x1
+ 1264 006a 0B       		.uleb128 0xb
+ 1265 006b 0B       		.uleb128 0xb
+ 1266 006c 3A       		.uleb128 0x3a
+ 1267 006d 0B       		.uleb128 0xb
+ 1268 006e 3B       		.uleb128 0x3b
+ 1269 006f 05       		.uleb128 0x5
+ 1270 0070 01       		.uleb128 0x1
+ 1271 0071 13       		.uleb128 0x13
+ 1272 0072 00       		.byte	0
+ 1273 0073 00       		.byte	0
+ 1274 0074 0B       		.uleb128 0xb
+ 1275 0075 2E       		.uleb128 0x2e
+ 1276 0076 01       		.byte	0x1
+ 1277 0077 3F       		.uleb128 0x3f
+ 1278 0078 19       		.uleb128 0x19
+ 1279 0079 03       		.uleb128 0x3
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 28
+
+
+ 1280 007a 0E       		.uleb128 0xe
+ 1281 007b 3A       		.uleb128 0x3a
+ 1282 007c 0B       		.uleb128 0xb
+ 1283 007d 3B       		.uleb128 0x3b
+ 1284 007e 0B       		.uleb128 0xb
+ 1285 007f 27       		.uleb128 0x27
+ 1286 0080 19       		.uleb128 0x19
+ 1287 0081 11       		.uleb128 0x11
+ 1288 0082 01       		.uleb128 0x1
+ 1289 0083 12       		.uleb128 0x12
+ 1290 0084 06       		.uleb128 0x6
+ 1291 0085 40       		.uleb128 0x40
+ 1292 0086 18       		.uleb128 0x18
+ 1293 0087 9642     		.uleb128 0x2116
+ 1294 0089 19       		.uleb128 0x19
+ 1295 008a 01       		.uleb128 0x1
+ 1296 008b 13       		.uleb128 0x13
+ 1297 008c 00       		.byte	0
+ 1298 008d 00       		.byte	0
+ 1299 008e 0C       		.uleb128 0xc
+ 1300 008f 05       		.uleb128 0x5
+ 1301 0090 00       		.byte	0
+ 1302 0091 03       		.uleb128 0x3
+ 1303 0092 0E       		.uleb128 0xe
+ 1304 0093 3A       		.uleb128 0x3a
+ 1305 0094 0B       		.uleb128 0xb
+ 1306 0095 3B       		.uleb128 0x3b
+ 1307 0096 0B       		.uleb128 0xb
+ 1308 0097 49       		.uleb128 0x49
+ 1309 0098 13       		.uleb128 0x13
+ 1310 0099 02       		.uleb128 0x2
+ 1311 009a 18       		.uleb128 0x18
+ 1312 009b 00       		.byte	0
+ 1313 009c 00       		.byte	0
+ 1314 009d 0D       		.uleb128 0xd
+ 1315 009e 0B       		.uleb128 0xb
+ 1316 009f 01       		.byte	0x1
+ 1317 00a0 11       		.uleb128 0x11
+ 1318 00a1 01       		.uleb128 0x1
+ 1319 00a2 12       		.uleb128 0x12
+ 1320 00a3 06       		.uleb128 0x6
+ 1321 00a4 00       		.byte	0
+ 1322 00a5 00       		.byte	0
+ 1323 00a6 0E       		.uleb128 0xe
+ 1324 00a7 34       		.uleb128 0x34
+ 1325 00a8 00       		.byte	0
+ 1326 00a9 03       		.uleb128 0x3
+ 1327 00aa 08       		.uleb128 0x8
+ 1328 00ab 3A       		.uleb128 0x3a
+ 1329 00ac 0B       		.uleb128 0xb
+ 1330 00ad 3B       		.uleb128 0x3b
+ 1331 00ae 0B       		.uleb128 0xb
+ 1332 00af 49       		.uleb128 0x49
+ 1333 00b0 13       		.uleb128 0x13
+ 1334 00b1 02       		.uleb128 0x2
+ 1335 00b2 18       		.uleb128 0x18
+ 1336 00b3 00       		.byte	0
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 29
+
+
+ 1337 00b4 00       		.byte	0
+ 1338 00b5 0F       		.uleb128 0xf
+ 1339 00b6 2E       		.uleb128 0x2e
+ 1340 00b7 00       		.byte	0
+ 1341 00b8 3F       		.uleb128 0x3f
+ 1342 00b9 19       		.uleb128 0x19
+ 1343 00ba 03       		.uleb128 0x3
+ 1344 00bb 0E       		.uleb128 0xe
+ 1345 00bc 3A       		.uleb128 0x3a
+ 1346 00bd 0B       		.uleb128 0xb
+ 1347 00be 3B       		.uleb128 0x3b
+ 1348 00bf 0B       		.uleb128 0xb
+ 1349 00c0 27       		.uleb128 0x27
+ 1350 00c1 19       		.uleb128 0x19
+ 1351 00c2 11       		.uleb128 0x11
+ 1352 00c3 01       		.uleb128 0x1
+ 1353 00c4 12       		.uleb128 0x12
+ 1354 00c5 06       		.uleb128 0x6
+ 1355 00c6 40       		.uleb128 0x40
+ 1356 00c7 18       		.uleb128 0x18
+ 1357 00c8 9642     		.uleb128 0x2116
+ 1358 00ca 19       		.uleb128 0x19
+ 1359 00cb 00       		.byte	0
+ 1360 00cc 00       		.byte	0
+ 1361 00cd 10       		.uleb128 0x10
+ 1362 00ce 2E       		.uleb128 0x2e
+ 1363 00cf 01       		.byte	0x1
+ 1364 00d0 3F       		.uleb128 0x3f
+ 1365 00d1 19       		.uleb128 0x19
+ 1366 00d2 03       		.uleb128 0x3
+ 1367 00d3 0E       		.uleb128 0xe
+ 1368 00d4 3A       		.uleb128 0x3a
+ 1369 00d5 0B       		.uleb128 0xb
+ 1370 00d6 3B       		.uleb128 0x3b
+ 1371 00d7 0B       		.uleb128 0xb
+ 1372 00d8 49       		.uleb128 0x49
+ 1373 00d9 13       		.uleb128 0x13
+ 1374 00da 11       		.uleb128 0x11
+ 1375 00db 01       		.uleb128 0x1
+ 1376 00dc 12       		.uleb128 0x12
+ 1377 00dd 06       		.uleb128 0x6
+ 1378 00de 40       		.uleb128 0x40
+ 1379 00df 18       		.uleb128 0x18
+ 1380 00e0 9642     		.uleb128 0x2116
+ 1381 00e2 19       		.uleb128 0x19
+ 1382 00e3 01       		.uleb128 0x1
+ 1383 00e4 13       		.uleb128 0x13
+ 1384 00e5 00       		.byte	0
+ 1385 00e6 00       		.byte	0
+ 1386 00e7 11       		.uleb128 0x11
+ 1387 00e8 34       		.uleb128 0x34
+ 1388 00e9 00       		.byte	0
+ 1389 00ea 03       		.uleb128 0x3
+ 1390 00eb 0E       		.uleb128 0xe
+ 1391 00ec 3A       		.uleb128 0x3a
+ 1392 00ed 0B       		.uleb128 0xb
+ 1393 00ee 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 30
+
+
+ 1394 00ef 0B       		.uleb128 0xb
+ 1395 00f0 49       		.uleb128 0x49
+ 1396 00f1 13       		.uleb128 0x13
+ 1397 00f2 02       		.uleb128 0x2
+ 1398 00f3 18       		.uleb128 0x18
+ 1399 00f4 00       		.byte	0
+ 1400 00f5 00       		.byte	0
+ 1401 00f6 12       		.uleb128 0x12
+ 1402 00f7 34       		.uleb128 0x34
+ 1403 00f8 00       		.byte	0
+ 1404 00f9 03       		.uleb128 0x3
+ 1405 00fa 0E       		.uleb128 0xe
+ 1406 00fb 3A       		.uleb128 0x3a
+ 1407 00fc 0B       		.uleb128 0xb
+ 1408 00fd 3B       		.uleb128 0x3b
+ 1409 00fe 05       		.uleb128 0x5
+ 1410 00ff 49       		.uleb128 0x49
+ 1411 0100 13       		.uleb128 0x13
+ 1412 0101 3F       		.uleb128 0x3f
+ 1413 0102 19       		.uleb128 0x19
+ 1414 0103 3C       		.uleb128 0x3c
+ 1415 0104 19       		.uleb128 0x19
+ 1416 0105 00       		.byte	0
+ 1417 0106 00       		.byte	0
+ 1418 0107 13       		.uleb128 0x13
+ 1419 0108 34       		.uleb128 0x34
+ 1420 0109 00       		.byte	0
+ 1421 010a 03       		.uleb128 0x3
+ 1422 010b 0E       		.uleb128 0xe
+ 1423 010c 3A       		.uleb128 0x3a
+ 1424 010d 0B       		.uleb128 0xb
+ 1425 010e 3B       		.uleb128 0x3b
+ 1426 010f 0B       		.uleb128 0xb
+ 1427 0110 49       		.uleb128 0x49
+ 1428 0111 13       		.uleb128 0x13
+ 1429 0112 3F       		.uleb128 0x3f
+ 1430 0113 19       		.uleb128 0x19
+ 1431 0114 02       		.uleb128 0x2
+ 1432 0115 18       		.uleb128 0x18
+ 1433 0116 00       		.byte	0
+ 1434 0117 00       		.byte	0
+ 1435 0118 14       		.uleb128 0x14
+ 1436 0119 34       		.uleb128 0x34
+ 1437 011a 00       		.byte	0
+ 1438 011b 03       		.uleb128 0x3
+ 1439 011c 0E       		.uleb128 0xe
+ 1440 011d 3A       		.uleb128 0x3a
+ 1441 011e 0B       		.uleb128 0xb
+ 1442 011f 3B       		.uleb128 0x3b
+ 1443 0120 0B       		.uleb128 0xb
+ 1444 0121 49       		.uleb128 0x49
+ 1445 0122 13       		.uleb128 0x13
+ 1446 0123 3F       		.uleb128 0x3f
+ 1447 0124 19       		.uleb128 0x19
+ 1448 0125 3C       		.uleb128 0x3c
+ 1449 0126 19       		.uleb128 0x19
+ 1450 0127 00       		.byte	0
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 31
+
+
+ 1451 0128 00       		.byte	0
+ 1452 0129 00       		.byte	0
+ 1453              		.section	.debug_aranges,"",%progbits
+ 1454 0000 34000000 		.4byte	0x34
+ 1455 0004 0200     		.2byte	0x2
+ 1456 0006 00000000 		.4byte	.Ldebug_info0
+ 1457 000a 04       		.byte	0x4
+ 1458 000b 00       		.byte	0
+ 1459 000c 0000     		.2byte	0
+ 1460 000e 0000     		.2byte	0
+ 1461 0010 00000000 		.4byte	.LFB35
+ 1462 0014 44000000 		.4byte	.LFE35-.LFB35
+ 1463 0018 00000000 		.4byte	.LFB36
+ 1464 001c 58000000 		.4byte	.LFE36-.LFB36
+ 1465 0020 00000000 		.4byte	.LFB37
+ 1466 0024 4C000000 		.4byte	.LFE37-.LFB37
+ 1467 0028 00000000 		.4byte	.LFB38
+ 1468 002c A8010000 		.4byte	.LFE38-.LFB38
+ 1469 0030 00000000 		.4byte	0
+ 1470 0034 00000000 		.4byte	0
+ 1471              		.section	.debug_ranges,"",%progbits
+ 1472              	.Ldebug_ranges0:
+ 1473 0000 00000000 		.4byte	.LFB35
+ 1474 0004 44000000 		.4byte	.LFE35
+ 1475 0008 00000000 		.4byte	.LFB36
+ 1476 000c 58000000 		.4byte	.LFE36
+ 1477 0010 00000000 		.4byte	.LFB37
+ 1478 0014 4C000000 		.4byte	.LFE37
+ 1479 0018 00000000 		.4byte	.LFB38
+ 1480 001c A8010000 		.4byte	.LFE38
+ 1481 0020 00000000 		.4byte	0
+ 1482 0024 00000000 		.4byte	0
+ 1483              		.section	.debug_line,"",%progbits
+ 1484              	.Ldebug_line0:
+ 1485 0000 66010000 		.section	.debug_str,"MS",%progbits,1
+ 1485      0200AE00 
+ 1485      00000201 
+ 1485      FB0E0D00 
+ 1485      01010101 
+ 1486              	.LASF66:
+ 1487 0000 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_RX_CREDIT_IND\000"
+ 1487      455F4556 
+ 1487      545F4C32 
+ 1487      4341505F 
+ 1487      43424643 
+ 1488              	.LASF22:
+ 1489 0023 4359424C 		.ascii	"CYBLE_EVT_STACK_BUSY_STATUS\000"
+ 1489      455F4556 
+ 1489      545F5354 
+ 1489      41434B5F 
+ 1489      42555359 
+ 1490              	.LASF148:
+ 1491 003f 6D61696E 		.ascii	"mainTimer\000"
+ 1491      54696D65 
+ 1491      7200
+ 1492              	.LASF132:
+ 1493 0049 4359424C 		.ascii	"CYBLE_STATE_STOPPED\000"
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 32
+
+
+ 1493      455F5354 
+ 1493      4154455F 
+ 1493      53544F50 
+ 1493      50454400 
+ 1494              	.LASF65:
+ 1495 005d 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DATA_READ\000"
+ 1495      455F4556 
+ 1495      545F4C32 
+ 1495      4341505F 
+ 1495      43424643 
+ 1496              	.LASF154:
+ 1497 007c 433A5C55 		.ascii	"C:\\Users\\jdmoussa\\Documents\\PSoC Creator\\BLE_B"
+ 1497      73657273 
+ 1497      5C6A646D 
+ 1497      6F757373 
+ 1497      615C446F 
+ 1498 00aa 6C6F6F64 		.ascii	"lood_Pressure_Sensor01\\BLE_Blood_Pressure_Sensor01"
+ 1498      5F507265 
+ 1498      73737572 
+ 1498      655F5365 
+ 1498      6E736F72 
+ 1499 00dc 2E637964 		.ascii	".cydsn\000"
+ 1499      736E00
+ 1500              	.LASF33:
+ 1501 00e3 4359424C 		.ascii	"CYBLE_EVT_GAP_CONNECTION_UPDATE_COMPLETE\000"
+ 1501      455F4556 
+ 1501      545F4741 
+ 1501      505F434F 
+ 1501      4E4E4543 
+ 1502              	.LASF64:
+ 1503 010c 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DISCONN_CNF\000"
+ 1503      455F4556 
+ 1503      545F4C32 
+ 1503      4341505F 
+ 1503      43424643 
+ 1504              	.LASF47:
+ 1505 012d 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_MULTI_RSP\000"
+ 1505      455F4556 
+ 1505      545F4741 
+ 1505      5454435F 
+ 1505      52454144 
+ 1506              	.LASF52:
+ 1507 014c 4359424C 		.ascii	"CYBLE_EVT_GATTS_EXEC_WRITE_REQ\000"
+ 1507      455F4556 
+ 1507      545F4741 
+ 1507      5454535F 
+ 1507      45584543 
+ 1508              	.LASF108:
+ 1509 016b 4359424C 		.ascii	"CYBLE_LP_MODE_T\000"
+ 1509      455F4C50 
+ 1509      5F4D4F44 
+ 1509      455F5400 
+ 1510              	.LASF19:
+ 1511 017b 4359424C 		.ascii	"CYBLE_EVT_TIMEOUT\000"
+ 1511      455F4556 
+ 1511      545F5449 
+ 1511      4D454F55 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 33
+
+
+ 1511      5400
+ 1512              	.LASF4:
+ 1513 018d 6C6F6E67 		.ascii	"long int\000"
+ 1513      20696E74 
+ 1513      00
+ 1514              	.LASF84:
+ 1515 0196 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_PSM_WRONG_ENCODING\000"
+ 1515      455F4552 
+ 1515      524F525F 
+ 1515      4C324341 
+ 1515      505F5053 
+ 1516              	.LASF75:
+ 1517 01bb 4359424C 		.ascii	"CYBLE_ERROR_INSUFFICIENT_RESOURCES\000"
+ 1517      455F4552 
+ 1517      524F525F 
+ 1517      494E5355 
+ 1517      46464943 
+ 1518              	.LASF21:
+ 1519 01de 4359424C 		.ascii	"CYBLE_EVT_HCI_STATUS\000"
+ 1519      455F4556 
+ 1519      545F4843 
+ 1519      495F5354 
+ 1519      41545553 
+ 1520              	.LASF34:
+ 1521 01f3 4359424C 		.ascii	"CYBLE_EVT_GAPC_SCAN_START_STOP\000"
+ 1521      455F4556 
+ 1521      545F4741 
+ 1521      50435F53 
+ 1521      43414E5F 
+ 1522              	.LASF69:
+ 1523 0212 4359424C 		.ascii	"CYBLE_EVT_PENDING_FLASH_WRITE\000"
+ 1523      455F4556 
+ 1523      545F5045 
+ 1523      4E44494E 
+ 1523      475F464C 
+ 1524              	.LASF109:
+ 1525 0230 4359424C 		.ascii	"CYBLE_BLESS_STATE_ACTIVE\000"
+ 1525      455F424C 
+ 1525      4553535F 
+ 1525      53544154 
+ 1525      455F4143 
+ 1526              	.LASF32:
+ 1527 0249 4359424C 		.ascii	"CYBLE_EVT_GAP_ENCRYPT_CHANGE\000"
+ 1527      455F4556 
+ 1527      545F4741 
+ 1527      505F454E 
+ 1527      43525950 
+ 1528              	.LASF135:
+ 1529 0266 4359424C 		.ascii	"CYBLE_STATE_ADVERTISING\000"
+ 1529      455F5354 
+ 1529      4154455F 
+ 1529      41445645 
+ 1529      52544953 
+ 1530              	.LASF6:
+ 1531 027e 6C6F6E67 		.ascii	"long long int\000"
+ 1531      206C6F6E 
+ 1531      6720696E 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 34
+
+
+ 1531      7400
+ 1532              	.LASF0:
+ 1533 028c 7369676E 		.ascii	"signed char\000"
+ 1533      65642063 
+ 1533      68617200 
+ 1534              	.LASF18:
+ 1535 0298 4359424C 		.ascii	"CYBLE_EVT_STACK_ON\000"
+ 1535      455F4556 
+ 1535      545F5354 
+ 1535      41434B5F 
+ 1535      4F4E00
+ 1536              	.LASF91:
+ 1537 02ab 4359424C 		.ascii	"CYBLE_ERROR_DEVICE_ALREADY_EXISTS\000"
+ 1537      455F4552 
+ 1537      524F525F 
+ 1537      44455649 
+ 1537      43455F41 
+ 1538              	.LASF78:
+ 1539 02cd 4359424C 		.ascii	"CYBLE_ERROR_NO_DEVICE_ENTITY\000"
+ 1539      455F4552 
+ 1539      524F525F 
+ 1539      4E4F5F44 
+ 1539      45564943 
+ 1540              	.LASF24:
+ 1541 02ea 4359424C 		.ascii	"CYBLE_EVT_GAP_AUTH_REQ\000"
+ 1541      455F4556 
+ 1541      545F4741 
+ 1541      505F4155 
+ 1541      54485F52 
+ 1542              	.LASF45:
+ 1543 0301 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_RSP\000"
+ 1543      455F4556 
+ 1543      545F4741 
+ 1543      5454435F 
+ 1543      52454144 
+ 1544              	.LASF101:
+ 1545 031a 4359424C 		.ascii	"CYBLE_ERROR_INVALID_STATE\000"
+ 1545      455F4552 
+ 1545      524F525F 
+ 1545      494E5641 
+ 1545      4C49445F 
+ 1546              	.LASF50:
+ 1547 0334 4359424C 		.ascii	"CYBLE_EVT_GATTS_WRITE_CMD_REQ\000"
+ 1547      455F4556 
+ 1547      545F4741 
+ 1547      5454535F 
+ 1547      57524954 
+ 1548              	.LASF95:
+ 1549 0352 4359424C 		.ascii	"CYBLE_INCL_DISC_DONE\000"
+ 1549      455F494E 
+ 1549      434C5F44 
+ 1549      4953435F 
+ 1549      444F4E45 
+ 1550              	.LASF60:
+ 1551 0367 4359424C 		.ascii	"CYBLE_EVT_L2CAP_COMMAND_REJ\000"
+ 1551      455F4556 
+ 1551      545F4C32 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 35
+
+
+ 1551      4341505F 
+ 1551      434F4D4D 
+ 1552              	.LASF136:
+ 1553 0383 4359424C 		.ascii	"CYBLE_STATE_DISCONNECTED\000"
+ 1553      455F5354 
+ 1553      4154455F 
+ 1553      44495343 
+ 1553      4F4E4E45 
+ 1554              	.LASF29:
+ 1555 039c 4359424C 		.ascii	"CYBLE_EVT_GAPP_ADVERTISEMENT_START_STOP\000"
+ 1555      455F4556 
+ 1555      545F4741 
+ 1555      50505F41 
+ 1555      44564552 
+ 1556              	.LASF89:
+ 1557 03c4 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_PSM_NOT_IN_RANGE\000"
+ 1557      455F4552 
+ 1557      524F525F 
+ 1557      4C324341 
+ 1557      505F5053 
+ 1558              	.LASF9:
+ 1559 03e7 75696E74 		.ascii	"uint8\000"
+ 1559      3800
+ 1560              	.LASF83:
+ 1561 03ed 4359424C 		.ascii	"CYBLE_ERROR_SEC_FAILED\000"
+ 1561      455F4552 
+ 1561      524F525F 
+ 1561      5345435F 
+ 1561      4641494C 
+ 1562              	.LASF53:
+ 1563 0404 4359424C 		.ascii	"CYBLE_EVT_GATTC_EXEC_WRITE_RSP\000"
+ 1563      455F4556 
+ 1563      545F4741 
+ 1563      5454435F 
+ 1563      45584543 
+ 1564              	.LASF13:
+ 1565 0423 646F7562 		.ascii	"double\000"
+ 1565      6C6500
+ 1566              	.LASF72:
+ 1567 042a 4359424C 		.ascii	"CYBLE_ERROR_INVALID_PARAMETER\000"
+ 1567      455F4552 
+ 1567      524F525F 
+ 1567      494E5641 
+ 1567      4C49445F 
+ 1568              	.LASF126:
+ 1569 0448 4359424C 		.ascii	"CYBLE_DIS_FIRMWARE_REV\000"
+ 1569      455F4449 
+ 1569      535F4649 
+ 1569      524D5741 
+ 1569      52455F52 
+ 1570              	.LASF11:
+ 1571 045f 75696E74 		.ascii	"uint32\000"
+ 1571      333200
+ 1572              	.LASF125:
+ 1573 0466 4359424C 		.ascii	"CYBLE_DIS_HARDWARE_REV\000"
+ 1573      455F4449 
+ 1573      535F4841 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 36
+
+
+ 1573      52445741 
+ 1573      52455F52 
+ 1574              	.LASF70:
+ 1575 047d 4359424C 		.ascii	"CYBLE_EVT_MAX\000"
+ 1575      455F4556 
+ 1575      545F4D41 
+ 1575      5800
+ 1576              	.LASF71:
+ 1577 048b 4359424C 		.ascii	"CYBLE_ERROR_OK\000"
+ 1577      455F4552 
+ 1577      524F525F 
+ 1577      4F4B00
+ 1578              	.LASF36:
+ 1579 049a 4359424C 		.ascii	"CYBLE_EVT_GATTC_ERROR_RSP\000"
+ 1579      455F4556 
+ 1579      545F4741 
+ 1579      5454435F 
+ 1579      4552524F 
+ 1580              	.LASF58:
+ 1581 04b4 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CONN_PARAM_UPDATE_REQ\000"
+ 1581      455F4556 
+ 1581      545F4C32 
+ 1581      4341505F 
+ 1581      434F4E4E 
+ 1582              	.LASF68:
+ 1583 04da 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DATA_WRITE_IND\000"
+ 1583      455F4556 
+ 1583      545F4C32 
+ 1583      4341505F 
+ 1583      43424643 
+ 1584              	.LASF121:
+ 1585 04fe 4359424C 		.ascii	"CYBLE_BLS_CHAR_COUNT\000"
+ 1585      455F424C 
+ 1585      535F4348 
+ 1585      41525F43 
+ 1585      4F554E54 
+ 1586              	.LASF7:
+ 1587 0513 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1587      206C6F6E 
+ 1587      6720756E 
+ 1587      7369676E 
+ 1587      65642069 
+ 1588              	.LASF74:
+ 1589 052a 4359424C 		.ascii	"CYBLE_ERROR_MEMORY_ALLOCATION_FAILED\000"
+ 1589      455F4552 
+ 1589      524F525F 
+ 1589      4D454D4F 
+ 1589      52595F41 
+ 1590              	.LASF76:
+ 1591 054f 4359424C 		.ascii	"CYBLE_ERROR_OOB_NOT_AVAILABLE\000"
+ 1591      455F4552 
+ 1591      524F525F 
+ 1591      4F4F425F 
+ 1591      4E4F545F 
+ 1592              	.LASF144:
+ 1593 056d 626C6573 		.ascii	"blessState\000"
+ 1593      73537461 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 37
+
+
+ 1593      746500
+ 1594              	.LASF38:
+ 1595 0578 4359424C 		.ascii	"CYBLE_EVT_GATT_DISCONNECT_IND\000"
+ 1595      455F4556 
+ 1595      545F4741 
+ 1595      54545F44 
+ 1595      4953434F 
+ 1596              	.LASF85:
+ 1597 0596 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_PSM_ALREADY_REGISTERED\000"
+ 1597      455F4552 
+ 1597      524F525F 
+ 1597      4C324341 
+ 1597      505F5053 
+ 1598              	.LASF114:
+ 1599 05bf 4359424C 		.ascii	"CYBLE_BLESS_STATE_DEEPSLEEP\000"
+ 1599      455F424C 
+ 1599      4553535F 
+ 1599      53544154 
+ 1599      455F4445 
+ 1600              	.LASF5:
+ 1601 05db 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1601      20756E73 
+ 1601      69676E65 
+ 1601      6420696E 
+ 1601      7400
+ 1602              	.LASF149:
+ 1603 05ed 66656174 		.ascii	"feature\000"
+ 1603      75726500 
+ 1604              	.LASF107:
+ 1605 05f5 4359424C 		.ascii	"CYBLE_BLESS_INVALID\000"
+ 1605      455F424C 
+ 1605      4553535F 
+ 1605      494E5641 
+ 1605      4C494400 
+ 1606              	.LASF40:
+ 1607 0609 4359424C 		.ascii	"CYBLE_EVT_GATTC_XCHNG_MTU_RSP\000"
+ 1607      455F4556 
+ 1607      545F4741 
+ 1607      5454435F 
+ 1607      5843484E 
+ 1608              	.LASF57:
+ 1609 0627 4359424C 		.ascii	"CYBLE_EVT_GATTS_DATA_SIGNED_CMD_REQ\000"
+ 1609      455F4556 
+ 1609      545F4741 
+ 1609      5454535F 
+ 1609      44415441 
+ 1610              	.LASF143:
+ 1611 064b 6C704D6F 		.ascii	"lpMode\000"
+ 1611      646500
+ 1612              	.LASF88:
+ 1613 0652 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_CHANNEL_NOT_FOUND\000"
+ 1613      455F4552 
+ 1613      524F525F 
+ 1613      4C324341 
+ 1613      505F4348 
+ 1614              	.LASF138:
+ 1615 0676 6576656E 		.ascii	"event\000"
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 38
+
+
+ 1615      7400
+ 1616              	.LASF98:
+ 1617 067c 4359424C 		.ascii	"CYBLE_ERROR_NTF_DISABLED\000"
+ 1617      455F4552 
+ 1617      524F525F 
+ 1617      4E54465F 
+ 1617      44495341 
+ 1618              	.LASF17:
+ 1619 0695 4359424C 		.ascii	"CYBLE_EVT_HOST_INVALID\000"
+ 1619      455F4556 
+ 1619      545F484F 
+ 1619      53545F49 
+ 1619      4E56414C 
+ 1620              	.LASF43:
+ 1621 06ac 4359424C 		.ascii	"CYBLE_EVT_GATTC_FIND_INFO_RSP\000"
+ 1621      455F4556 
+ 1621      545F4741 
+ 1621      5454435F 
+ 1621      46494E44 
+ 1622              	.LASF25:
+ 1623 06ca 4359424C 		.ascii	"CYBLE_EVT_GAP_PASSKEY_ENTRY_REQUEST\000"
+ 1623      455F4556 
+ 1623      545F4741 
+ 1623      505F5041 
+ 1623      53534B45 
+ 1624              	.LASF30:
+ 1625 06ee 4359424C 		.ascii	"CYBLE_EVT_GAP_DEVICE_CONNECTED\000"
+ 1625      455F4556 
+ 1625      545F4741 
+ 1625      505F4445 
+ 1625      56494345 
+ 1626              	.LASF48:
+ 1627 070d 4359424C 		.ascii	"CYBLE_EVT_GATTS_WRITE_REQ\000"
+ 1627      455F4556 
+ 1627      545F4741 
+ 1627      5454535F 
+ 1627      57524954 
+ 1628              	.LASF130:
+ 1629 0727 4359424C 		.ascii	"CYBLE_DIS_PNP_ID\000"
+ 1629      455F4449 
+ 1629      535F504E 
+ 1629      505F4944 
+ 1629      00
+ 1630              	.LASF147:
+ 1631 0738 6379426C 		.ascii	"cyBle_state\000"
+ 1631      655F7374 
+ 1631      61746500 
+ 1632              	.LASF26:
+ 1633 0744 4359424C 		.ascii	"CYBLE_EVT_GAP_PASSKEY_DISPLAY_REQUEST\000"
+ 1633      455F4556 
+ 1633      545F4741 
+ 1633      505F5041 
+ 1633      53534B45 
+ 1634              	.LASF37:
+ 1635 076a 4359424C 		.ascii	"CYBLE_EVT_GATT_CONNECT_IND\000"
+ 1635      455F4556 
+ 1635      545F4741 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 39
+
+
+ 1635      54545F43 
+ 1635      4F4E4E45 
+ 1636              	.LASF115:
+ 1637 0785 4359424C 		.ascii	"CYBLE_BLESS_STATE_HIBERNATE\000"
+ 1637      455F424C 
+ 1637      4553535F 
+ 1637      53544154 
+ 1637      455F4849 
+ 1638              	.LASF15:
+ 1639 07a1 72656733 		.ascii	"reg32\000"
+ 1639      3200
+ 1640              	.LASF23:
+ 1641 07a7 4359424C 		.ascii	"CYBLE_EVT_GAPC_SCAN_PROGRESS_RESULT\000"
+ 1641      455F4556 
+ 1641      545F4741 
+ 1641      50435F53 
+ 1641      43414E5F 
+ 1642              	.LASF128:
+ 1643 07cb 4359424C 		.ascii	"CYBLE_DIS_SYSTEM_ID\000"
+ 1643      455F4449 
+ 1643      535F5359 
+ 1643      5354454D 
+ 1643      5F494400 
+ 1644              	.LASF97:
+ 1645 07df 4359424C 		.ascii	"CYBLE_DESCR_DISC_DONE\000"
+ 1645      455F4445 
+ 1645      5343525F 
+ 1645      44495343 
+ 1645      5F444F4E 
+ 1646              	.LASF94:
+ 1647 07f5 4359424C 		.ascii	"CYBLE_ERROR_MAX\000"
+ 1647      455F4552 
+ 1647      524F525F 
+ 1647      4D415800 
+ 1648              	.LASF61:
+ 1649 0805 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_CONN_IND\000"
+ 1649      455F4556 
+ 1649      545F4C32 
+ 1649      4341505F 
+ 1649      43424643 
+ 1650              	.LASF42:
+ 1651 0823 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_BY_TYPE_RSP\000"
+ 1651      455F4556 
+ 1651      545F4741 
+ 1651      5454435F 
+ 1651      52454144 
+ 1652              	.LASF16:
+ 1653 0844 73697A65 		.ascii	"sizetype\000"
+ 1653      74797065 
+ 1653      00
+ 1654              	.LASF133:
+ 1655 084d 4359424C 		.ascii	"CYBLE_STATE_INITIALIZING\000"
+ 1655      455F5354 
+ 1655      4154455F 
+ 1655      494E4954 
+ 1655      49414C49 
+ 1656              	.LASF28:
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 40
+
+
+ 1657 0866 4359424C 		.ascii	"CYBLE_EVT_GAP_AUTH_FAILED\000"
+ 1657      455F4556 
+ 1657      545F4741 
+ 1657      505F4155 
+ 1657      54485F46 
+ 1658              	.LASF155:
+ 1659 0880 5744545F 		.ascii	"WDT_Start\000"
+ 1659      53746172 
+ 1659      7400
+ 1660              	.LASF49:
+ 1661 088a 4359424C 		.ascii	"CYBLE_EVT_GATTC_WRITE_RSP\000"
+ 1661      455F4556 
+ 1661      545F4741 
+ 1661      5454435F 
+ 1661      57524954 
+ 1662              	.LASF140:
+ 1663 08a4 41707043 		.ascii	"AppCallBack\000"
+ 1663      616C6C42 
+ 1663      61636B00 
+ 1664              	.LASF150:
+ 1665 08b0 626C7346 		.ascii	"blsFlag\000"
+ 1665      6C616700 
+ 1666              	.LASF27:
+ 1667 08b8 4359424C 		.ascii	"CYBLE_EVT_GAP_AUTH_COMPLETE\000"
+ 1667      455F4556 
+ 1667      545F4741 
+ 1667      505F4155 
+ 1667      54485F43 
+ 1668              	.LASF145:
+ 1669 08d4 61706952 		.ascii	"apiResult\000"
+ 1669      6573756C 
+ 1669      7400
+ 1670              	.LASF102:
+ 1671 08de 4359424C 		.ascii	"CYBLE_API_RESULT_T\000"
+ 1671      455F4150 
+ 1671      495F5245 
+ 1671      53554C54 
+ 1671      5F5400
+ 1672              	.LASF54:
+ 1673 08f1 4359424C 		.ascii	"CYBLE_EVT_GATTC_HANDLE_VALUE_NTF\000"
+ 1673      455F4556 
+ 1673      545F4741 
+ 1673      5454435F 
+ 1673      48414E44 
+ 1674              	.LASF99:
+ 1675 0912 4359424C 		.ascii	"CYBLE_ERROR_IND_DISABLED\000"
+ 1675      455F4552 
+ 1675      524F525F 
+ 1675      494E445F 
+ 1675      44495341 
+ 1676              	.LASF129:
+ 1677 092b 4359424C 		.ascii	"CYBLE_DIS_REG_CERT_DATA\000"
+ 1677      455F4449 
+ 1677      535F5245 
+ 1677      475F4345 
+ 1677      52545F44 
+ 1678              	.LASF62:
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 41
+
+
+ 1679 0943 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_CONN_CNF\000"
+ 1679      455F4556 
+ 1679      545F4C32 
+ 1679      4341505F 
+ 1679      43424643 
+ 1680              	.LASF41:
+ 1681 0961 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_BY_GROUP_TYPE_RSP\000"
+ 1681      455F4556 
+ 1681      545F4741 
+ 1681      5454435F 
+ 1681      52454144 
+ 1682              	.LASF12:
+ 1683 0988 666C6F61 		.ascii	"float\000"
+ 1683      7400
+ 1684              	.LASF146:
+ 1685 098e 6379426C 		.ascii	"cyBle_pendingFlashWrite\000"
+ 1685      655F7065 
+ 1685      6E64696E 
+ 1685      67466C61 
+ 1685      73685772 
+ 1686              	.LASF152:
+ 1687 09a6 474E5520 		.ascii	"GNU C 4.8.4 20140526 (release) [ARM/embedded-4_8-br"
+ 1687      4320342E 
+ 1687      382E3420 
+ 1687      32303134 
+ 1687      30353236 
+ 1688 09d9 616E6368 		.ascii	"anch revision 211358] -mcpu=cortex-m0 -mthumb -g -O"
+ 1688      20726576 
+ 1688      6973696F 
+ 1688      6E203231 
+ 1688      31333538 
+ 1689 0a0c 30202D66 		.ascii	"0 -ffunction-sections\000"
+ 1689      66756E63 
+ 1689      74696F6E 
+ 1689      2D736563 
+ 1689      74696F6E 
+ 1690              	.LASF124:
+ 1691 0a22 4359424C 		.ascii	"CYBLE_DIS_SERIAL_NUMBER\000"
+ 1691      455F4449 
+ 1691      535F5345 
+ 1691      5249414C 
+ 1691      5F4E554D 
+ 1692              	.LASF111:
+ 1693 0a3a 4359424C 		.ascii	"CYBLE_BLESS_STATE_SLEEP\000"
+ 1693      455F424C 
+ 1693      4553535F 
+ 1693      53544154 
+ 1693      455F534C 
+ 1694              	.LASF81:
+ 1695 0a52 4359424C 		.ascii	"CYBLE_ERROR_TX_POWER_READ\000"
+ 1695      455F4552 
+ 1695      524F525F 
+ 1695      54585F50 
+ 1695      4F574552 
+ 1696              	.LASF100:
+ 1697 0a6c 4359424C 		.ascii	"CYBLE_ERROR_CHAR_IS_NOT_DISCOVERED\000"
+ 1697      455F4552 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 42
+
+
+ 1697      524F525F 
+ 1697      43484152 
+ 1697      5F49535F 
+ 1698              	.LASF1:
+ 1699 0a8f 756E7369 		.ascii	"unsigned char\000"
+ 1699      676E6564 
+ 1699      20636861 
+ 1699      7200
+ 1700              	.LASF10:
+ 1701 0a9d 75696E74 		.ascii	"uint16\000"
+ 1701      313600
+ 1702              	.LASF131:
+ 1703 0aa4 4359424C 		.ascii	"CYBLE_DIS_CHAR_COUNT\000"
+ 1703      455F4449 
+ 1703      535F4348 
+ 1703      41525F43 
+ 1703      4F554E54 
+ 1704              	.LASF2:
+ 1705 0ab9 73686F72 		.ascii	"short int\000"
+ 1705      7420696E 
+ 1705      7400
+ 1706              	.LASF55:
+ 1707 0ac3 4359424C 		.ascii	"CYBLE_EVT_GATTC_HANDLE_VALUE_IND\000"
+ 1707      455F4556 
+ 1707      545F4741 
+ 1707      5454435F 
+ 1707      48414E44 
+ 1708              	.LASF77:
+ 1709 0ae4 4359424C 		.ascii	"CYBLE_ERROR_NO_CONNECTION\000"
+ 1709      455F4552 
+ 1709      524F525F 
+ 1709      4E4F5F43 
+ 1709      4F4E4E45 
+ 1710              	.LASF127:
+ 1711 0afe 4359424C 		.ascii	"CYBLE_DIS_SOFTWARE_REV\000"
+ 1711      455F4449 
+ 1711      535F534F 
+ 1711      46545741 
+ 1711      52455F52 
+ 1712              	.LASF151:
+ 1713 0b15 62617474 		.ascii	"batteryMeasure\000"
+ 1713      6572794D 
+ 1713      65617375 
+ 1713      726500
+ 1714              	.LASF51:
+ 1715 0b24 4359424C 		.ascii	"CYBLE_EVT_GATTS_PREP_WRITE_REQ\000"
+ 1715      455F4556 
+ 1715      545F4741 
+ 1715      5454535F 
+ 1715      50524550 
+ 1716              	.LASF116:
+ 1717 0b43 4359424C 		.ascii	"CYBLE_BLESS_STATE_INVALID\000"
+ 1717      455F424C 
+ 1717      4553535F 
+ 1717      53544154 
+ 1717      455F494E 
+ 1718              	.LASF56:
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 43
+
+
+ 1719 0b5d 4359424C 		.ascii	"CYBLE_EVT_GATTS_HANDLE_VALUE_CNF\000"
+ 1719      455F4556 
+ 1719      545F4741 
+ 1719      5454535F 
+ 1719      48414E44 
+ 1720              	.LASF79:
+ 1721 0b7e 4359424C 		.ascii	"CYBLE_ERROR_REPEATED_ATTEMPTS\000"
+ 1721      455F4552 
+ 1721      524F525F 
+ 1721      52455045 
+ 1721      41544544 
+ 1722              	.LASF153:
+ 1723 0b9c 2E5C6D61 		.ascii	".\\main.c\000"
+ 1723      696E2E63 
+ 1723      00
+ 1724              	.LASF117:
+ 1725 0ba5 4359424C 		.ascii	"CYBLE_BLESS_STATE_T\000"
+ 1725      455F424C 
+ 1725      4553535F 
+ 1725      53544154 
+ 1725      455F5400 
+ 1726              	.LASF14:
+ 1727 0bb9 63686172 		.ascii	"char\000"
+ 1727      00
+ 1728              	.LASF104:
+ 1729 0bbe 4359424C 		.ascii	"CYBLE_BLESS_SLEEP\000"
+ 1729      455F424C 
+ 1729      4553535F 
+ 1729      534C4545 
+ 1729      5000
+ 1730              	.LASF123:
+ 1731 0bd0 4359424C 		.ascii	"CYBLE_DIS_MODEL_NUMBER\000"
+ 1731      455F4449 
+ 1731      535F4D4F 
+ 1731      44454C5F 
+ 1731      4E554D42 
+ 1732              	.LASF82:
+ 1733 0be7 4359424C 		.ascii	"CYBLE_ERROR_BT_ON_NOT_COMPLETED\000"
+ 1733      455F4552 
+ 1733      524F525F 
+ 1733      42545F4F 
+ 1733      4E5F4E4F 
+ 1734              	.LASF31:
+ 1735 0c07 4359424C 		.ascii	"CYBLE_EVT_GAP_DEVICE_DISCONNECTED\000"
+ 1735      455F4556 
+ 1735      545F4741 
+ 1735      505F4445 
+ 1735      56494345 
+ 1736              	.LASF8:
+ 1737 0c29 756E7369 		.ascii	"unsigned int\000"
+ 1737      676E6564 
+ 1737      20696E74 
+ 1737      00
+ 1738              	.LASF67:
+ 1739 0c36 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_TX_CREDIT_IND\000"
+ 1739      455F4556 
+ 1739      545F4C32 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 44
+
+
+ 1739      4341505F 
+ 1739      43424643 
+ 1740              	.LASF92:
+ 1741 0c59 4359424C 		.ascii	"CYBLE_ERROR_FLASH_WRITE_NOT_PERMITED\000"
+ 1741      455F4552 
+ 1741      524F525F 
+ 1741      464C4153 
+ 1741      485F5752 
+ 1742              	.LASF87:
+ 1743 0c7e 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_CONNECTION_ENTITY_NOT_FOUND\000"
+ 1743      455F4552 
+ 1743      524F525F 
+ 1743      4C324341 
+ 1743      505F434F 
+ 1744              	.LASF20:
+ 1745 0cac 4359424C 		.ascii	"CYBLE_EVT_HARDWARE_ERROR\000"
+ 1745      455F4556 
+ 1745      545F4841 
+ 1745      52445741 
+ 1745      52455F45 
+ 1746              	.LASF3:
+ 1747 0cc5 73686F72 		.ascii	"short unsigned int\000"
+ 1747      7420756E 
+ 1747      7369676E 
+ 1747      65642069 
+ 1747      6E7400
+ 1748              	.LASF110:
+ 1749 0cd8 4359424C 		.ascii	"CYBLE_BLESS_STATE_EVENT_CLOSE\000"
+ 1749      455F424C 
+ 1749      4553535F 
+ 1749      53544154 
+ 1749      455F4556 
+ 1750              	.LASF73:
+ 1751 0cf6 4359424C 		.ascii	"CYBLE_ERROR_INVALID_OPERATION\000"
+ 1751      455F4552 
+ 1751      524F525F 
+ 1751      494E5641 
+ 1751      4C49445F 
+ 1752              	.LASF39:
+ 1753 0d14 4359424C 		.ascii	"CYBLE_EVT_GATTS_XCNHG_MTU_REQ\000"
+ 1753      455F4556 
+ 1753      545F4741 
+ 1753      5454535F 
+ 1753      58434E48 
+ 1754              	.LASF139:
+ 1755 0d32 6576656E 		.ascii	"eventParam\000"
+ 1755      74506172 
+ 1755      616D00
+ 1756              	.LASF106:
+ 1757 0d3d 4359424C 		.ascii	"CYBLE_BLESS_HIBERNATE\000"
+ 1757      455F424C 
+ 1757      4553535F 
+ 1757      48494245 
+ 1757      524E4154 
+ 1758              	.LASF112:
+ 1759 0d53 4359424C 		.ascii	"CYBLE_BLESS_STATE_ECO_ON\000"
+ 1759      455F424C 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 45
+
+
+ 1759      4553535F 
+ 1759      53544154 
+ 1759      455F4543 
+ 1760              	.LASF137:
+ 1761 0d6c 4359424C 		.ascii	"CYBLE_STATE_T\000"
+ 1761      455F5354 
+ 1761      4154455F 
+ 1761      5400
+ 1762              	.LASF46:
+ 1763 0d7a 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_BLOB_RSP\000"
+ 1763      455F4556 
+ 1763      545F4741 
+ 1763      5454435F 
+ 1763      52454144 
+ 1764              	.LASF120:
+ 1765 0d98 4359424C 		.ascii	"CYBLE_BLS_BPF\000"
+ 1765      455F424C 
+ 1765      535F4250 
+ 1765      4600
+ 1766              	.LASF113:
+ 1767 0da6 4359424C 		.ascii	"CYBLE_BLESS_STATE_ECO_STABLE\000"
+ 1767      455F424C 
+ 1767      4553535F 
+ 1767      53544154 
+ 1767      455F4543 
+ 1768              	.LASF93:
+ 1769 0dc3 4359424C 		.ascii	"CYBLE_ERROR_MIC_AUTH_FAILED\000"
+ 1769      455F4552 
+ 1769      524F525F 
+ 1769      4D49435F 
+ 1769      41555448 
+ 1770              	.LASF118:
+ 1771 0ddf 4359424C 		.ascii	"CYBLE_BLS_BPM\000"
+ 1771      455F424C 
+ 1771      535F4250 
+ 1771      4D00
+ 1772              	.LASF86:
+ 1773 0ded 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_PSM_NOT_REGISTERED\000"
+ 1773      455F4552 
+ 1773      524F525F 
+ 1773      4C324341 
+ 1773      505F5053 
+ 1774              	.LASF134:
+ 1775 0e12 4359424C 		.ascii	"CYBLE_STATE_CONNECTED\000"
+ 1775      455F5354 
+ 1775      4154455F 
+ 1775      434F4E4E 
+ 1775      45435445 
+ 1776              	.LASF105:
+ 1777 0e28 4359424C 		.ascii	"CYBLE_BLESS_DEEPSLEEP\000"
+ 1777      455F424C 
+ 1777      4553535F 
+ 1777      44454550 
+ 1777      534C4545 
+ 1778              	.LASF44:
+ 1779 0e3e 4359424C 		.ascii	"CYBLE_EVT_GATTC_FIND_BY_TYPE_VALUE_RSP\000"
+ 1779      455F4556 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 46
+
+
+ 1779      545F4741 
+ 1779      5454435F 
+ 1779      46494E44 
+ 1780              	.LASF80:
+ 1781 0e65 4359424C 		.ascii	"CYBLE_ERROR_GAP_ROLE\000"
+ 1781      455F4552 
+ 1781      524F525F 
+ 1781      4741505F 
+ 1781      524F4C45 
+ 1782              	.LASF35:
+ 1783 0e7a 4359424C 		.ascii	"CYBLE_EVT_GAP_KEYINFO_EXCHNGE_CMPLT\000"
+ 1783      455F4556 
+ 1783      545F4741 
+ 1783      505F4B45 
+ 1783      59494E46 
+ 1784              	.LASF119:
+ 1785 0e9e 4359424C 		.ascii	"CYBLE_BLS_ICP\000"
+ 1785      455F424C 
+ 1785      535F4943 
+ 1785      5000
+ 1786              	.LASF63:
+ 1787 0eac 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DISCONN_IND\000"
+ 1787      455F4556 
+ 1787      545F4C32 
+ 1787      4341505F 
+ 1787      43424643 
+ 1788              	.LASF96:
+ 1789 0ecd 4359424C 		.ascii	"CYBLE_CHAR_DISC_DONE\000"
+ 1789      455F4348 
+ 1789      41525F44 
+ 1789      4953435F 
+ 1789      444F4E45 
+ 1790              	.LASF141:
+ 1791 0ee2 54696D65 		.ascii	"Timer_Interrupt\000"
+ 1791      725F496E 
+ 1791      74657272 
+ 1791      75707400 
+ 1792              	.LASF59:
+ 1793 0ef2 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CONN_PARAM_UPDATE_RSP\000"
+ 1793      455F4556 
+ 1793      545F4C32 
+ 1793      4341505F 
+ 1793      434F4E4E 
+ 1794              	.LASF142:
+ 1795 0f18 6D61696E 		.ascii	"main\000"
+ 1795      00
+ 1796              	.LASF103:
+ 1797 0f1d 4359424C 		.ascii	"CYBLE_BLESS_ACTIVE\000"
+ 1797      455F424C 
+ 1797      4553535F 
+ 1797      41435449 
+ 1797      564500
+ 1798              	.LASF122:
+ 1799 0f30 4359424C 		.ascii	"CYBLE_DIS_MANUFACTURER_NAME\000"
+ 1799      455F4449 
+ 1799      535F4D41 
+ 1799      4E554641 
+ARM GAS  C:\Users\jdmoussa\AppData\Local\Temp\ccbJZeok.s 			page 47
+
+
+ 1799      43545552 
+ 1800              	.LASF90:
+ 1801 0f4c 4359424C 		.ascii	"CYBLE_ERROR_GATT_DB_INVALID_ATTR_HANDLE\000"
+ 1801      455F4552 
+ 1801      524F525F 
+ 1801      47415454 
+ 1801      5F44425F 
+ 1802              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.8.4 20140526 (release) [ARM/embedded-4_8-br

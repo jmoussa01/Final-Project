@@ -1,0 +1,5 @@
+C:\Users\jdmoussa\Documents\PSoC Creator\BLE_Blood_Pressure_Sensor01\BLE_Blood_Pressure_Sensor01.cydsn\BLE_Blood_Pressure_Sensor01.cyprj|231fe051-34f1-413d-bb0d-4e0ff0f97174
+C:\Program Files (x86)\Cypress\PSoC Creator\3.1\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|d3bc0666-f416-4785-b85e-59990852b0d9
+C:\Program Files (x86)\Cypress\PSoC Creator\3.1\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|55f063fb-f627-4446-a81d-fd70be3ea055
+C:\Program Files (x86)\Cypress\PSoC Creator\3.1\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|543ddab7-3be2-4409-b3ce-fe690ef6d8a4
+C:\Program Files (x86)\Cypress\PSoC Creator\3.1\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|3d829c51-eb4e-4810-9dce-f2feaacb0b6d
